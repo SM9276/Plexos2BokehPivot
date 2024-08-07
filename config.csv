@@ -18,7 +18,7 @@ Interfaces_filename,Interfaces,,
 Lines_filename,Lines,,
 Nodes_filename,Nodes,,
 Regions_filename,Regions,,
-Batteries_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",
 EmissionGenerators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",

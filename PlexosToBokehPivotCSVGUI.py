@@ -12,8 +12,16 @@ class CSVProcessorApp:
         self.root = root
         self.root.title("CSV Processor")
 
+        # Store the path of the 'runs' folder
+        self.runs_folder_path = os.path.abspath(output_base_folder)
+        
+        self.last_processed_file = None  # To store the full path of the last processed file
+
         self.process_button = tk.Button(root, text="Process Files", command=self.process_files)
         self.process_button.pack(pady=10)
+
+        self.copy_path_button = tk.Button(root, text="Copy Runs Folder Path", command=self.copy_runs_folder_path)
+        self.copy_path_button.pack(pady=10)
 
         self.customize_button = tk.Button(root, text="Customize CSV", command=self.open_customize_window)
         self.customize_button.pack(pady=10)
@@ -30,18 +38,23 @@ class CSVProcessorApp:
                 # Paths to the CSV files
                 generators_file_path = os.path.join(scenario_path, 'Generators.csv')
                 emissions_file_path = os.path.join(scenario_path, 'Emissions.csv')
+                batteries_file_path = os.path.join(scenario_path, 'Batteries.csv')
                 
                 if os.path.exists(generators_file_path):
-                    self.process_generators_file(scenario, generators_file_path)
+                    self.process_generators_file(scenario, generators_file_path, batteries_file_path)
                 
                 if os.path.exists(emissions_file_path):
                     self.process_emissions_file(scenario, emissions_file_path)
 
         messagebox.showinfo("Processing Complete", "All files have been processed successfully.")
 
-    def process_generators_file(self, scenario, file_path):
-        df_gen = pd.read_csv(file_path)
-        
+    def process_generators_file(self, scenario, generators_file_path, batteries_file_path):
+        df_gen = pd.read_csv(generators_file_path)
+        if os.path.exists(batteries_file_path):
+            df_bat = pd.read_csv(batteries_file_path)
+            # Assuming batteries file has the same columns as generators, otherwise adjust accordingly
+            df_gen = pd.concat([df_gen, df_bat], ignore_index=True)
+
         # Extract year, month, and hour from the _date column using string slicing
         df_gen['year'] = df_gen['_date'].str.split(' ').str[0].str.split('/').str[2]  # Year part of the date string
         df_gen['hour'] = 'h' + df_gen['_date'].str.split(' ').str[1].str.split(':').str[0]  # Hour part of the time string, prefixed with 'h'
@@ -62,6 +75,7 @@ class CSVProcessorApp:
         output_file_path_gen_h = os.path.join(output_dir, 'gen_h.csv')
         df_gen_h.to_csv(output_file_path_gen_h, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_h}')
+        self.last_processed_file = os.path.abspath(output_file_path_gen_h)  # Update last processed file path
         
         # Create and save the gen_ivrt.csv file
         data_gen_ivrt = {
@@ -75,6 +89,7 @@ class CSVProcessorApp:
         output_file_path_gen_ivrt = os.path.join(output_dir, 'gen_ivrt.csv')
         df_gen_ivrt.to_csv(output_file_path_gen_ivrt, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_ivrt}')
+        self.last_processed_file = os.path.abspath(output_file_path_gen_ivrt)  # Update last processed file path
         
         # Create and save the gen_ann.csv file
         data_gen_ann = {
@@ -87,6 +102,7 @@ class CSVProcessorApp:
         output_file_path_gen_ann = os.path.join(output_dir, 'gen_ann.csv')
         df_gen_ann.to_csv(output_file_path_gen_ann, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_ann}')
+        self.last_processed_file = os.path.abspath(output_file_path_gen_ann)  # Update last processed file path
 
     def process_emissions_file(self, scenario, file_path):
         df_emi = pd.read_csv(file_path)
@@ -108,7 +124,15 @@ class CSVProcessorApp:
         output_file_path_emit_r = os.path.join(output_dir, 'emit_r.csv')
         df_emit_r.to_csv(output_file_path_emit_r, index=False)
         print(f'Saved transformed file to: {output_file_path_emit_r}')
+        self.last_processed_file = os.path.abspath(output_file_path_emit_r)  # Update last processed file path
     
+    def copy_runs_folder_path(self):
+        # Copy the path of the 'runs' folder to the clipboard
+        self.root.clipboard_clear()
+        self.root.clipboard_append(self.runs_folder_path)
+        self.root.update()  # Now it stays on the clipboard
+        messagebox.showinfo("Copied", f"Runs folder path copied to clipboard: {self.runs_folder_path}")
+
     def open_customize_window(self):
         CustomizationWindow(self.root)
 
@@ -153,7 +177,7 @@ class CustomizationWindow:
         self.remove_dim_button = tk.Button(self.window, text="Remove Dimension", command=self.remove_dimension)
         self.remove_dim_button.grid(row=3, column=1, padx=10, pady=10)
 
-        self.val_label = tk.Label(self.window, text="Value Column")
+        self.val_label = tk.Label(self.window, text="Select Value Column")
         self.val_label.grid(row=4, column=0, padx=10, pady=10)
 
         self.val_dropdown = ttk.Combobox(self.window, textvariable=self.val_var)
@@ -266,8 +290,9 @@ class CustomizationWindow:
         os.makedirs(output_dir, exist_ok=True)
         output_file_path = os.path.join(output_dir, output_name)
         output_df.to_csv(output_file_path, index=False)
+        
+        self.last_processed_file = os.path.abspath(output_file_path)  # Update last processed file path
         messagebox.showinfo("Success", f"Custom CSV saved to: {output_file_path}")
-
 
 if __name__ == "__main__":
     root = tk.Tk()
