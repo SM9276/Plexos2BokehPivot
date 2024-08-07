@@ -1,0 +1,32 @@
+assumption,default value,default action description,value
+studyId,,shows eligible studies for user to pick,
+input_folder,PlexosSolutions/,,
+output_folder,PlexosOutputs/,,
+solution_filename,,empty value queries all zip files,
+server_name,(local),,
+database_name,,,Constellation_db
+db_username,,uses Windows Authentication for SQL Server Connection,
+db_password,,uses Windows Authentication for SQL Server Connection,
+collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators
+run_in_parallel,no,,
+Batteries_filename,Batteries,,
+EmissionGenerators_filename,EmissionGenerators,,
+Emissions_filename,Emissions,,
+Generators_filename,Generators,,
+Hubs_filename,Hubs,,
+Interfaces_filename,Interfaces,,
+Lines_filename,Lines,,
+Nodes_filename,Nodes,,
+Regions_filename,Regions,,
+Batteries_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
+EmissionGenerators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Hubs_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Interfaces_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Lines_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Nodes_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
+Regions_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",
+taskName,PLEXOS_Cloud_To_Local,Specifies the name of the task,
+startTime,16:51,Specifies the start time for the task,
+partition_data,12,,
