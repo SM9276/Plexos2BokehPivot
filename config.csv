@@ -7,7 +7,7 @@ server_name,(local),,
 database_name,,,Constellation_db
 db_username,,uses Windows Authentication for SQL Server Connection,
 db_password,,uses Windows Authentication for SQL Server Connection,
-collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators
+collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Emissions
 run_in_parallel,no,,
 Batteries_filename,Batteries,,
 EmissionGenerators_filename,EmissionGenerators,,
