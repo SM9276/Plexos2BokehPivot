@@ -56,4 +56,17 @@ Canada,#193A71
 smr,#D49E2E
 smr-ccs,#5F522D
 electrolyzer,#896F2D
+base expansion,#9B014F
+ic_ng,#52216B
+scct_ot,#820000
+st_ng,#66C238
+ccct_ng,#D40000
+scct_ng,#CC015C
+othertech_ng,#ff69b4
+st_coal,#000000
+ic_ot,#DF5282
+wt_wnd,#666666
+hy_wat,#187F94
+st_ot,#5B9844
+pv_sun,#708238
 Other,#ff69b4
