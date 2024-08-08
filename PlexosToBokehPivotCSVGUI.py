@@ -12,19 +12,17 @@ class CSVProcessorApp:
         self.root = root
         self.root.title("CSV Processor")
 
-        # Store the path of the 'runs' folder
-        self.runs_folder_path = os.path.abspath(output_base_folder)
-        
-        self.last_processed_file = None  # To store the full path of the last processed file
-
         self.process_button = tk.Button(root, text="Process Files", command=self.process_files)
         self.process_button.pack(pady=10)
 
-        self.copy_path_button = tk.Button(root, text="Copy Runs Folder Path", command=self.copy_runs_folder_path)
-        self.copy_path_button.pack(pady=10)
-
         self.customize_button = tk.Button(root, text="Customize CSV", command=self.open_customize_window)
         self.customize_button.pack(pady=10)
+
+        self.copy_button = tk.Button(root, text="Copy Runs Folder Path", command=self.copy_runs_folder_path)
+        self.copy_button.pack(pady=10)
+
+        self.last_processed_file = None  # Variable to store the path of the last processed file
+        self.runs_folder_path = os.path.abspath(output_base_folder)  # Store the absolute path of the runs folder
 
     def process_files(self):
         # Iterate through each scenario subfolder
@@ -41,20 +39,21 @@ class CSVProcessorApp:
                 batteries_file_path = os.path.join(scenario_path, 'Batteries.csv')
                 
                 if os.path.exists(generators_file_path):
-                    self.process_generators_file(scenario, generators_file_path, batteries_file_path)
+                    self.process_generators_file(scenario, generators_file_path)
                 
                 if os.path.exists(emissions_file_path):
                     self.process_emissions_file(scenario, emissions_file_path)
 
+                if os.path.exists(batteries_file_path):
+                    self.process_batteries_file(scenario, batteries_file_path)
+
+                self.create_cap_csv(scenario, generators_file_path, batteries_file_path)
+
         messagebox.showinfo("Processing Complete", "All files have been processed successfully.")
 
-    def process_generators_file(self, scenario, generators_file_path, batteries_file_path):
-        df_gen = pd.read_csv(generators_file_path)
-        if os.path.exists(batteries_file_path):
-            df_bat = pd.read_csv(batteries_file_path)
-            # Assuming batteries file has the same columns as generators, otherwise adjust accordingly
-            df_gen = pd.concat([df_gen, df_bat], ignore_index=True)
-
+    def process_generators_file(self, scenario, file_path):
+        df_gen = pd.read_csv(file_path)
+        
         # Extract year, month, and hour from the _date column using string slicing
         df_gen['year'] = df_gen['_date'].str.split(' ').str[0].str.split('/').str[2]  # Year part of the date string
         df_gen['hour'] = 'h' + df_gen['_date'].str.split(' ').str[1].str.split(':').str[0]  # Hour part of the time string, prefixed with 'h'
@@ -75,7 +74,6 @@ class CSVProcessorApp:
         output_file_path_gen_h = os.path.join(output_dir, 'gen_h.csv')
         df_gen_h.to_csv(output_file_path_gen_h, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_h}')
-        self.last_processed_file = os.path.abspath(output_file_path_gen_h)  # Update last processed file path
         
         # Create and save the gen_ivrt.csv file
         data_gen_ivrt = {
@@ -89,7 +87,6 @@ class CSVProcessorApp:
         output_file_path_gen_ivrt = os.path.join(output_dir, 'gen_ivrt.csv')
         df_gen_ivrt.to_csv(output_file_path_gen_ivrt, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_ivrt}')
-        self.last_processed_file = os.path.abspath(output_file_path_gen_ivrt)  # Update last processed file path
         
         # Create and save the gen_ann.csv file
         data_gen_ann = {
@@ -102,7 +99,80 @@ class CSVProcessorApp:
         output_file_path_gen_ann = os.path.join(output_dir, 'gen_ann.csv')
         df_gen_ann.to_csv(output_file_path_gen_ann, index=False)
         print(f'Saved transformed file to: {output_file_path_gen_ann}')
-        self.last_processed_file = os.path.abspath(output_file_path_gen_ann)  # Update last processed file path
+
+    def process_batteries_file(self, scenario, file_path):
+        df_bat = pd.read_csv(file_path)
+
+        # Extract year from _date column
+        if '_date' in df_bat.columns:
+            df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
+            df_bat['hour'] = 'h' + df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]  # Hour part of the time string, prefixed with 'h'
+            df_bat['month'] = 'p' + df_bat['_date'].str.split('/').str[0]  # First part of the date string for month, prefixed with 'p'
+
+        output_dir = os.path.join(output_base_folder, scenario, 'outputs')
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Prepare data for appending to existing gen_h.csv, gen_ivrt.csv, gen_ann.csv
+        data_bat_h = {
+            "Dim1": df_bat["category_name"],
+            "Dim2": df_bat["month"],
+            "Dim3": df_bat["hour"],
+            "Dim4": df_bat["year"],
+            "Val": df_bat["Generation (GWh)"]
+        }
+        df_bat_h = pd.DataFrame(data_bat_h)
+
+        data_bat_ivrt = {
+            "Dim1": df_bat["category_name"],
+            "Dim2": df_bat["child_name"],
+            "Dim3": 'p1',
+            "Dim4": df_bat["year"],
+            "Val": df_bat["Generation (GWh)"]
+        }
+        df_bat_ivrt = pd.DataFrame(data_bat_ivrt)
+
+        data_bat_ann = {
+            "Dim1": df_bat["category_name"],
+            "Dim2": 'p1',
+            "Dim3": df_bat["year"],
+            "Val": df_bat["Generation (GWh)"]
+        }
+        df_bat_ann = pd.DataFrame(data_bat_ann)
+
+        # Paths to existing CSV files
+        gen_h_file_path = os.path.join(output_dir, 'gen_h.csv')
+        gen_ivrt_file_path = os.path.join(output_dir, 'gen_ivrt.csv')
+        gen_ann_file_path = os.path.join(output_dir, 'gen_ann.csv')
+
+        # Append data to existing CSV files or create new ones if they don't exist
+        if os.path.exists(gen_h_file_path):
+            df_existing_gen_h = pd.read_csv(gen_h_file_path)
+            df_combined_gen_h = pd.concat([df_existing_gen_h, df_bat_h], ignore_index=True)
+        else:
+            df_combined_gen_h = df_bat_h
+
+        if os.path.exists(gen_ivrt_file_path):
+            df_existing_gen_ivrt = pd.read_csv(gen_ivrt_file_path)
+            df_combined_gen_ivrt = pd.concat([df_existing_gen_ivrt, df_bat_ivrt], ignore_index=True)
+        else:
+            df_combined_gen_ivrt = df_bat_ivrt
+
+        if os.path.exists(gen_ann_file_path):
+            df_existing_gen_ann = pd.read_csv(gen_ann_file_path)
+            df_combined_gen_ann = pd.concat([df_existing_gen_ann, df_bat_ann], ignore_index=True)
+        else:
+            df_combined_gen_ann = df_bat_ann
+
+        # Save the updated CSV files
+        df_combined_gen_h.to_csv(gen_h_file_path, index=False)
+        print(f'Updated gen_h.csv with batteries data: {gen_h_file_path}')
+
+        df_combined_gen_ivrt.to_csv(gen_ivrt_file_path, index=False)
+        print(f'Updated gen_ivrt.csv with batteries data: {gen_ivrt_file_path}')
+
+        df_combined_gen_ann.to_csv(gen_ann_file_path, index=False)
+        print(f'Updated gen_ann.csv with batteries data: {gen_ann_file_path}')
+
 
     def process_emissions_file(self, scenario, file_path):
         df_emi = pd.read_csv(file_path)
@@ -124,18 +194,58 @@ class CSVProcessorApp:
         output_file_path_emit_r = os.path.join(output_dir, 'emit_r.csv')
         df_emit_r.to_csv(output_file_path_emit_r, index=False)
         print(f'Saved transformed file to: {output_file_path_emit_r}')
-        self.last_processed_file = os.path.abspath(output_file_path_emit_r)  # Update last processed file path
-    
-    def copy_runs_folder_path(self):
-        # Copy the path of the 'runs' folder to the clipboard
-        self.root.clipboard_clear()
-        self.root.clipboard_append(self.runs_folder_path)
-        self.root.update()  # Now it stays on the clipboard
-        messagebox.showinfo("Copied", f"Runs folder path copied to clipboard: {self.runs_folder_path}")
+
+    def create_cap_csv(self, scenario, generators_file_path, batteries_file_path):
+        if not os.path.exists(batteries_file_path):
+            messagebox.showwarning("File Error", "Batteries.csv not found.")
+            return
+
+        # Load data from Generators and Batteries CSV files
+        df_gen = pd.read_csv(generators_file_path)
+        df_bat = pd.read_csv(batteries_file_path)
+
+        # Extract year from _date column
+        if '_date' in df_gen.columns:
+            df_gen['year'] = df_gen['_date'].str.split(' ').str[0].str.split('/').str[2]
+        if '_date' in df_bat.columns:
+            df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
+
+        # Prepare data from Generators and Batteries
+        df_gen_cap = df_gen[['category_name', 'year', 'Installed Capacity (MW)']].copy()
+        df_gen_cap['Dim2'] = 'p1'
+        df_gen_cap.rename(columns={'category_name': 'Dim1', 'Installed Capacity (MW)': 'Val'}, inplace=True)
+        
+        df_bat_cap = df_bat[['category_name', 'year', 'Installed Capacity (MWh)']].copy()
+        df_bat_cap['Dim2'] = 'p1'
+        df_bat_cap.rename(columns={'category_name': 'Dim1', 'Installed Capacity (MWh)': 'Val'}, inplace=True)
+
+        # Combine the data
+        df_combined = pd.concat([df_gen_cap, df_bat_cap], ignore_index=True)
+        df_combined['Dim3'] = df_combined['year']
+        df_combined = df_combined[['Dim1', 'Dim2', 'Dim3', 'Val']]
+
+        # Save the combined data to cap.csv
+        output_dir = os.path.join(output_base_folder, scenario, 'outputs')
+        os.makedirs(output_dir, exist_ok=True)
+        output_file_path = os.path.join(output_dir, 'cap.csv')
+        df_combined.to_csv(output_file_path, index=False)
+        print(f'Saved transformed file to: {output_file_path}')
+
+        # Update last processed file path
+        self.last_processed_file = os.path.abspath(output_file_path)
+        messagebox.showinfo("Success", f"cap.csv saved to: {output_file_path}")
 
     def open_customize_window(self):
         CustomizationWindow(self.root)
 
+    def copy_runs_folder_path(self):
+        if self.runs_folder_path:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(self.runs_folder_path)
+            self.root.update()  # Now it stays on the clipboard
+            messagebox.showinfo("Copied", f"Runs folder path copied to clipboard: {self.runs_folder_path}")
+        else:
+            messagebox.showwarning("Error", "Runs folder path is not set.")
 
 class CustomizationWindow:
     def __init__(self, parent):
@@ -177,7 +287,7 @@ class CustomizationWindow:
         self.remove_dim_button = tk.Button(self.window, text="Remove Dimension", command=self.remove_dimension)
         self.remove_dim_button.grid(row=3, column=1, padx=10, pady=10)
 
-        self.val_label = tk.Label(self.window, text="Select Value Column")
+        self.val_label = tk.Label(self.window, text="Value Column")
         self.val_label.grid(row=4, column=0, padx=10, pady=10)
 
         self.val_dropdown = ttk.Combobox(self.window, textvariable=self.val_var)
@@ -290,8 +400,6 @@ class CustomizationWindow:
         os.makedirs(output_dir, exist_ok=True)
         output_file_path = os.path.join(output_dir, output_name)
         output_df.to_csv(output_file_path, index=False)
-        
-        self.last_processed_file = os.path.abspath(output_file_path)  # Update last processed file path
         messagebox.showinfo("Success", f"Custom CSV saved to: {output_file_path}")
 
 if __name__ == "__main__":
