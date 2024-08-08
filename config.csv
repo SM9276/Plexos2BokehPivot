@@ -1,32 +1,27 @@
 assumption,default value,default action description,value
-studyId,,shows eligible studies for user to pick,
-input_folder,PlexosSolutions/,,
-output_folder,PlexosOutputs/,,
-solution_filename,,empty value queries all zip files,
-server_name,(local),,
+input_folder,PlexosSolutions/,,PlexosSolutions/
+output_folder,PlexosOutputs/,,PlexosOutputs/
 database_name,,,Constellation_db
-db_username,,uses Windows Authentication for SQL Server Connection,
-db_password,,uses Windows Authentication for SQL Server Connection,
-collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Batteries
-run_in_parallel,no,,
-Batteries_filename,Batteries,,
-EmissionGenerators_filename,EmissionGenerators,,
-Emissions_filename,Emissions,,
-Generators_filename,Generators,,
-Hubs_filename,Hubs,,
-Interfaces_filename,Interfaces,,
-Lines_filename,Lines,,
-Nodes_filename,Nodes,,
-Regions_filename,Regions,,
-Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",
+collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators Emissions Batteries
+run_in_parallel,no,,no
+Batteries_filename,Batteries,,Batteries
+EmissionGenerators_filename,EmissionGenerators,,EmissionGenerators
+Emissions_filename,Emissions,,Emissions
+Generators_filename,Generators,,Generators
+Hubs_filename,Hubs,,Hubs
+Interfaces_filename,Interfaces,,Interfaces
+Lines_filename,Lines,,Lines
+Nodes_filename,Nodes,,Nodes
+Regions_filename,Regions,,Regions
+Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 EmissionGenerators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
-Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",
-Hubs_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",
-Interfaces_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
-Lines_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
-Nodes_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",
-Regions_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",
-taskName,PLEXOS_Cloud_To_Local,Specifies the name of the task,
-startTime,16:51,Specifies the start time for the task,
-partition_data,12,,
+Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Hubs_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
+Interfaces_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month
+Lines_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month
+Nodes_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month
+Regions_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
+taskName,PLEXOS_Cloud_To_Local,Specifies the name of the task,PLEXOS_Cloud_To_Local
+startTime,16:51,Specifies the start time for the task,16:51
+partition_data,12,,12

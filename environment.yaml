@@ -1,0 +1,18 @@
+name: xml2csv
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - jupyter
+  - pandas
+  - ca-certificates
+  - certifi
+  - openssl
+  - pythonnet
+  - openpyxl
+  - dotnet
+  - pyarrow
+  - pyodbc
+  - sqlalchemy
+  - sqlalchemy-utils
+  - requests
