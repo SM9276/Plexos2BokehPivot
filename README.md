@@ -7,7 +7,7 @@ The enviorment.yml file found in the root directory is to be used with XML2CSV.p
 
  Another environment.yml file will be found in the X2BokehPivot directory, this is to be used with Bokeh Pivot.
 
- ## 2) Starting the program
+## 2) Starting the program
 
 ### PLEXOS Solution to CSV 
 Once the PLEXOS Solution files are gathered, place them into the PlexosSolutions directory. Take a look at config.csv, make sure to have all the correct parameters. Select the correct environment and run XML2CSV.py. In the PlexosOutputs directory, each Scenario will have its own dedicated directory with the collections that were processed. 
