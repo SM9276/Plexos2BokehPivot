@@ -5,12 +5,12 @@ Two python enviorments are used in this project, one to interact with the PLEXOS
 
 The enviorment.yml file found in the root directory is the to be used with XML2CSV.py and Plexos2BokehPivotGUI.py. Also make sure to have the PLEXOS API installed.
 
- Another enviorment.yml will be found in the X2BokehPivot folder this is to be used with BokehPivot.
+ Another enviorment.yml will be found in the X2BokehPivot directory this is to be used with BokehPivot.
 
  ## 2) Starting the program
 
 ### PLEXOS Solution to CSV 
-Once the Plexos Solution files is gathered, place them into the PlexosSolutions directory. Take a look at config.csv, make sure to have all the correct parameters. Select the correct enviorment and Run XML2CSV.py, the selected collections will be processed. In the PlexosOutputs folder each Scenerio will have its own dedicated folder with the collections that was processed. 
+Once the Plexos Solution files is gathered, place them into the PlexosSolutions directory. Take a look at config.csv, make sure to have all the correct parameters. Select the correct enviorment and run XML2CSV.py. In the PlexosOutputs directory each Scenerio will have its own dedicated directory with the collections that was processed. 
 
 Note: In the current state of the script, currently, the script only processes LTPlans since it was hard coded but the following lines can change it in line 174 and 198 to switch it to STSchedule.
 
@@ -33,7 +33,7 @@ The "Copy Runs Folder Path" button copies the runs directory path to the clipboa
 ### Bokeh Pivot
 Open the X2BokehPivot by selecting the correct enviorment and running the launch.bat, once your browser opens paste the runs directory path. If everything went correctly once a result and preset is choosen then a graph should appear.
  
-Note: To change the color of the technologies go into X2BokehPivot/in/reeds2 and select the tech_style.csv to change the colors of each technology.
+Note: To change the color of the technologies, navigate to X2BokehPivot/in/reeds2 and select the tech_style.csv to change the colors of each technology.
 
 
 
