@@ -1,4 +1,9 @@
 # PLEXOS2BokehPivot
+## Quick Installation + startup
+Run setup.bat, this should install the xml2csv enviorment, place the solution files in PlexosSolutions directory. Then run the launch.bat. 
+Go into the X2BokehPivot folder and install the enviorment by runing setup.bat and run BokehPivot by runing launch.bat
+
+
 
 ## 1) Getting started
 Two Python environments are used in this project, one to interact with the PLEXOS API and another to interact with ReEDS Bokeh Pivot. 
