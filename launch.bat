@@ -1,56 +1,30 @@
 @echo off
-:: Check if Mamba is installed
-where mamba >nul 2>nul
-if %errorlevel% neq 0 (
-    echo Mamba is not installed. Please install Mamba first.
-    exit /b 1
-)
+setlocal enabledelayedexpansion
 
-:: Define environment name and script paths
+:: Set the Miniforge installation path
+set INSTALL_PATH=%LOCALAPPDATA%\Miniforge3
+
+:: Set the name of the conda environment
 set ENV_NAME=xml2csv
-set SCRIPT1=XML2CSV.py
-set SCRIPT2=Plexos2BokehPivotGUI.py
 
-:: Activate the mamba environment
-echo Activating environment: %ENV_NAME%
-call mamba activate %ENV_NAME%
-if %errorlevel% neq 0 (
-    echo Failed to activate the environment %ENV_NAME%.
-    exit /b 1
-)
+:: Set the paths to your Python scripts
+set PYTHON_SCRIPT1=XML2CSV.py
+set PYTHON_SCRIPT2=Plexos2BokehPivotGUI.py
 
-:: Check if the first script exists and run it
-if exist %SCRIPT1% (
-    echo Running %SCRIPT1%...
-    python %SCRIPT1%
-    if %errorlevel% neq 0 (
-        echo Failed to run %SCRIPT1%.
-        exit /b 1
-    )
-) else (
-    echo %SCRIPT1% not found.
-    exit /b 1
-)
+:: Activate Miniforge environment
+echo Activating Miniforge environment '%ENV_NAME%'...
+call "%INSTALL_PATH%\condabin\conda.bat" activate %ENV_NAME%
 
-:: Check if the second script exists and run it
-if exist %SCRIPT2% (
-    echo Running %SCRIPT2%...
-    python %SCRIPT2%
-    if %errorlevel% neq 0 (
-        echo Failed to run %SCRIPT2%.
-        exit /b 1
-    )
-) else (
-    echo %SCRIPT2% not found.
-    exit /b 1
-)
+:: Run the first Python script
+echo Running Python script '%PYTHON_SCRIPT1%'...
+python "%PYTHON_SCRIPT1%"
 
-:: Deactivate the environment
-echo Deactivating environment...
-call mamba deactivate
-if %errorlevel% neq 0 (
-    echo Failed to deactivate the environment.
-    exit /b 1
-)
+:: Run the second Python script
+echo Running Python script '%PYTHON_SCRIPT2%'...
+python "%PYTHON_SCRIPT2%"
 
-echo All tasks completed successfully.
+:: Deactivate the conda environment
+echo Deactivating the conda environment...
+call conda deactivate
+
+pause
