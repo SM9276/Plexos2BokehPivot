@@ -27,4 +27,3 @@ python "%PYTHON_SCRIPT2%"
 echo Deactivating the conda environment...
 call conda deactivate
 
-pause

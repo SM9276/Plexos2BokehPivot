@@ -233,7 +233,6 @@ class CSVProcessorApp:
 
         # Update last processed file path
         self.last_processed_file = os.path.abspath(output_file_path)
-        messagebox.showinfo("Success", f"cap.csv saved to: {output_file_path}")
 
     def open_customize_window(self):
         CustomizationWindow(self.root)
