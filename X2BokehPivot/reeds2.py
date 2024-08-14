@@ -268,7 +268,7 @@ def pre_avgprice(dfs, **kw):
 
         cap_type_ls, op_type_ls = gather_cost_types(df)
 
-        df_rrs_map = pd.read_csv(this_dir_path + '/../../inputs/rsmap.csv').rename(columns={'*r':'r'})
+        df_rrs_map = pd.read_csv(this_dir_path + '/inputs/rsmap.csv').rename(columns={'*r':'r'})
         df_rrs_map.columns = ['regionnew','region']
 
         df_hours_map = pd.read_csv(this_dir_path + '/in/reeds2/m_map.csv')
@@ -468,7 +468,7 @@ def add_class(df, **kw):
     return df
 
 def map_rs_to_rb(df, **kw):
-    df_hier = pd.read_csv(this_dir_path + '/../../inputs/rsmap.csv').rename(columns={'*r':'r'})
+    df_hier = pd.read_csv(this_dir_path + '/inputs/rsmap.csv').rename(columns={'*r':'r'})
     dict_hier = dict(zip(df_hier['rs'], df_hier['r']))
     df.loc[df['region'].isin(dict_hier.keys()), 'region'] = df['region'].map(dict_hier)
     df.rename(columns={'region':'rb'}, inplace=True)
