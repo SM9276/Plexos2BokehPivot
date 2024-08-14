@@ -39,7 +39,6 @@ def find_horizon(sol_file, print_enabled=False):
     - date_to: End date found in the XML file.
     """
     with zipfile.ZipFile(sol_file) as zf:
-
         list_of_files_in_zip = zf.namelist()
         xml_file = None  # Initialize xml_file variable outside the loop
 
@@ -89,7 +88,8 @@ def find_horizon(sol_file, print_enabled=False):
 
                     # Increment line count
                     line_count += 1
-        except:
+        except Exception as e:
+            print(f"Error while processing the XML: {e}")
             input('Press any key to continue...')
 
     return date_from, date_to
@@ -169,18 +169,30 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                     output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
 
                     sol.QueryToCSV(
-                        output_csv_file, # String strCSVFile,
+                        output_csv_file,  # String strCSVFile,
                         False,  # Boolean bAppendToFile,   Use 'True' to append to the file
                         SimulationPhaseEnum.LTPlan,
-                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators, # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
-                        '', # String ParentName,
-                        '', # String ChildName,
-                        getattr(PeriodEnum, f'{period_enum_value}'), # PeriodEnum PeriodTypeId,
-                        SeriesTypeEnum.Properties, # SeriesTypeEnum SeriesTypeId,
-                        '', # String PropertyList[ = None], 
-                        getattr(getattr(System, "DateTime"), "Parse")(TS0), # Object DateFrom[ = None],
-                        getattr(getattr(System, "DateTime"), "Parse")(TS1), # Object DateTo[ = None],
+                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators,  # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
+                        '',  # String ParentName,
+                        '',  # String ChildName,
+                        getattr(PeriodEnum, f'{period_enum_value}'),  # PeriodEnum PeriodTypeId,
+                        SeriesTypeEnum.Properties,  # SeriesTypeEnum SeriesTypeId,
+                        '',  # String PropertyList[ = None], 
+                        getattr(getattr(System, "DateTime"), "Parse")(TS0),  # Object DateFrom[ = None],
+                        getattr(getattr(System, "DateTime"), "Parse")(TS1),  # Object DateTo[ = None],
                     )
+
+                    # Read the generated CSV file to add new columns
+                    df_bat = pd.read_csv(output_csv_file)
+
+                    if '_date' in df_bat.columns:
+                        # Extract year, hour, and month from the _date column
+                        df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
+                        df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]
+                        df_bat['month'] = df_bat['_date'].str.split('/').str[0]
+
+                        # Save the updated DataFrame back to the same CSV file
+                        df_bat.to_csv(output_csv_file, index=False)
 
                     # Convert absolute path to relative path
                     relative_sol_file_path = os.path.relpath(sol_file_path, input_folder)
@@ -193,15 +205,27 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 # Run the query as before for non-Interval periods
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
                 sol.QueryToCSV(
-                    output_csv_file, # String strCSVFile,
+                    output_csv_file,  # String strCSVFile,
                     False,  # Boolean bAppendToFile,   Use 'True' to append to the file
                     SimulationPhaseEnum.LTPlan,
-                    getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators, # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
-                    '', # String ParentName,
-                    '', # String ChildName,
-                    getattr(PeriodEnum, f'{period_enum_value}'), # PeriodEnum PeriodTypeId,
-                    SeriesTypeEnum.Properties, # SeriesTypeEnum SeriesTypeId,
+                    getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators,  # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
+                    '',  # String ParentName,
+                    '',  # String ChildName,
+                    getattr(PeriodEnum, f'{period_enum_value}'),  # PeriodEnum PeriodTypeId,
+                    SeriesTypeEnum.Properties,  # SeriesTypeEnum SeriesTypeId,
                 )
+
+                # Read the generated CSV file to add new columns
+                df_bat = pd.read_csv(output_csv_file)
+
+                if '_date' in df_bat.columns:
+                    # Extract year, hour, and month from the _date column
+                    df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
+                    df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]
+                    df_bat['month'] = df_bat['_date'].str.split('/').str[0]
+
+                    # Save the updated DataFrame back to the same CSV file
+                    df_bat.to_csv(output_csv_file, index=False)
 
                 # Convert absolute path to relative path
                 relative_sol_file_path = os.path.relpath(sol_file_path, input_folder)

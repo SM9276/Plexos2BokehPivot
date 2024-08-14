@@ -9,7 +9,8 @@ set ENV_NAME=xml2csv
 
 :: Set the paths to your Python scripts
 set PYTHON_SCRIPT1=XML2CSV.py
-set PYTHON_SCRIPT2=Plexos2BokehPivotGUI.py
+set PYTHON_SCRIPT2=Plexos2BokehPivot.py
+set PYTHON_SCRIPT3=CSV_concat.py
 
 :: Activate Miniforge environment
 echo Activating Miniforge environment '%ENV_NAME%'...
@@ -22,6 +23,10 @@ python "%PYTHON_SCRIPT1%"
 :: Run the second Python script
 echo Running Python script '%PYTHON_SCRIPT2%'...
 python "%PYTHON_SCRIPT2%"
+
+:: Run the second Python script
+echo Running Python script '%PYTHON_SCRIPT3%'...
+python "%PYTHON_SCRIPT3%"
 
 :: Deactivate the conda environment
 echo Deactivating the conda environment...
