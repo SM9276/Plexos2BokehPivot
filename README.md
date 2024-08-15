@@ -1,45 +1,93 @@
 # PLEXOS2BokehPivot
-## Quick Installation + startup
-Run setup.bat, this should install the xml2csv enviorment, place the solution files in PlexosSolutions directory. Then run the launch.bat. 
-Go into the X2BokehPivot folder and install the enviorment by runing setup.bat and run BokehPivot by runing launch.bat
 
+Welcome to PLEXOS2BokehPivot! This project converts PLEXOS XML solution files to CSV format and visualizes the data using Bokeh Pivot. Follow these steps to set up, convert, and visualize your data.
 
+## Installation
 
-## 1) Getting started
-Two Python environments are used in this project, one to interact with the PLEXOS API and another to interact with ReEDS Bokeh Pivot. 
+### Set Up the XML to CSV Environment
 
-The enviorment.yml file found in the root directory is to be used with XML2CSV.py and Plexos2BokehPivotGUI.py. Also make sure to have the PLEXOS API installed.
+1. Locate the `setup.bat` file in the root directory.
+2. Double-click `setup.bat` to run it. This script will install the XML to CSV environment necessary for the project.
+3. Place your PLEXOS solution files into the `PlexosSolutions` directory.
 
- Another environment.yml file will be found in the X2BokehPivot directory, this is to be used with Bokeh Pivot.
+### Set Up the Bokeh Pivot Environment
 
-## 2) Starting the program
+1. Navigate to the `X2BokehPivot` folder.
+2. Run `setup.bat` to install the Bokeh Pivot environment.
+3. Launch Bokeh Pivot by running `launch.bat`.
 
-### PLEXOS Solution to CSV 
-Once the PLEXOS Solution files are gathered, place them into the PlexosSolutions directory. Take a look at config.csv, make sure to have all the correct parameters. Select the correct environment and run XML2CSV.py. In the PlexosOutputs directory, each Scenario will have its own dedicated directory with the collections that were processed. 
+## Running the Program
 
-Note: In the current state of the script, it only processes LTPlans since it was hard coded, but the following lines can change it in lines 174 and 198 to switch it to STSchedule.
+### Convert PLEXOS Solution to CSV
 
+1. **Prepare Your PLEXOS Solution Files:**
+   - Ensure that all your PLEXOS solution files are placed in the `PlexosSolutions` directory, organized by scenario.
+
+2. **Check Configuration:**
+   - Open `config.csv` to verify that all parameters are correct.
+
+3. **Run the program**
+   - The output CSV files will be saved in the `runs` directory.
+   - Each scenario will have its own directory within `runs`, containing the processed files.
+
+   **Note:** The script processes LTPlans by default. To switch to STSchedule, update the following lines in the script:
+
+    ```python
     SimulationPhaseEnum.LTPlan
-Must be changed to 
+    ```
 
+    to
+
+    ```python
     SimulationPhaseEnum.STSchedule
+    ```
 
-### PLEXOS CSV to ReEDS CSV
-Next, run Plexos2BokehPivotGUI.py
+### Convert PLEXOS CSV to ReEDS CSV
 
-The "Process Files" button creates 5 files. The files created are cap.csv, emit_r.csv, gen_ann.csv, gen_h and gen_ivrt. These files represent Capacity National (GW), CO2 Emissions BA (tonne), Generation National (TWh), Gen by timeslice regional/national(GW) and Generation ivrt (TWh) in Bokeh Pivot, respectively. These CSVs are placed in the runs directory, which mimics the directory structure created by ReEDS. 
-    
-Note: The cap.csv file is necessary for Bokeh Pivot to consider the directory to be from ReEDS.
+1. **Launch Plexos2BokehPivot Mapping Tool:**
+   - Double-click `setting.bat` to start the tool.
+   - Select "Mapping mode" when prompted.
 
-The "Customize CSV" button is to be used when a graph is not automatically created and needs to be done from scratch. The mapping of each Dimension and value must be done according to the CSV file that will be mimicked.
+2. **Map Your Columns:**
+   - The tool will list CSV files from the `PlexosOutputs` folder. Choose the file you want to map, such as `generation.csv`.
+   - Map the columns to the dimensions required by Bokeh Pivot:
+     - **Example Mapping:**
+       - If you have a column named "category_name," map it to `Dim1`.
+       - For fixed values (e.g., a constant region), type `constant` and enter the value.
+       - Select the column for `Val` as the value column.
 
-The "Copy Runs Folder Path" button copies the runs directory path to the clipboard.
+3. **Save Your Configuration:**
+   - Enter a name for your mapping configuration to easily identify it later.
+   - The tool will automatically save your mapping settings in `configuration.json`.
 
-### Bokeh Pivot
-Open the X2BokehPivot by selecting the correct environment and running the launch.bat. Once your browser opens, paste the runs directory path. If everything went correctly once a result and preset were chosen, then a graph should appear.
- 
-Note: To change the color of the technologies, navigate to X2BokehPivot/in/reeds2 and select the tech_style.csv to change the colors of each technology.
+4. **Generate Output Files:**
+   - Run the tool again, choosing "Execute mode."
+   - The tool will generate new CSV files in the `runs` folder, named according to your mapping configuration.
 
+## Visualizing the Data with Bokeh Pivot
 
+1. **Open Bokeh Pivot:**
+   - Navigate to the `X2BokehPivot` directory.
+   - Run `launch.bat` to start Bokeh Pivot.
+   - When the browser opens, paste the path to the `runs` directory.
 
+2. **Load and Visualize Your Data:**
+   - Import the newly created CSV files from the `runs` folder into Bokeh Pivot.
+   - Apply the visualization you selected to see your data represented effectively.
 
+3. **Customize Visualizations:**
+   - To customize the colors of technologies, go to `X2BokehPivot/in/reeds2` and modify the `tech_style.csv` file.
+
+## Example Workflow
+
+1. **Prepare Your Files:**
+   - Place your PLEXOS solution files into the `PlexosSolutions` directory.
+
+2. **Run the program:**
+   - Verify configuration in `config.csv`.
+   - Run `lanuch.bat` to generate CSV files
+
+3. **Visualize with Bokeh Pivot:**
+   - Start Bokeh Pivot and paste the path to the `runs` directory.
+   - Import the CSV files and apply the desired visualizations.
+   - Customize the visualizations as needed.
