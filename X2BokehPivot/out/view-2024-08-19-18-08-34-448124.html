@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en">
+    <head>
+        <style>
+            @import url(https://fonts.googleapis.com/css?family=Noto+Sans);
+            body {
+              font-family: 'Noto Sans', sans-serif;
+              -webkit-font-smoothing: antialiased;
+              text-rendering: optimizeLegibility;
+            }
+            .bk-root>.bk{
+                position: static !important;
+                width: auto !important;
+                height: auto !important;
+                display: inline-block !important;
+            }
+            .bk-root>.bk>.bk{
+                position: relative !important;
+                top: 0px !important;
+                right: 0px !important;
+                bottom: 0px !important;
+                left: 0px !important;
+                float: left;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            .header_section{
+                width: auto !important;
+                height: auto !important;
+            }
+            .legend-color{
+                width: 20px;
+                height: 10px;
+                display: inline-block;
+                margin-right: 10px
+            }
+            .error{
+                color: red;
+                text-decoration: underline;
+            }
+            .config-display-title{
+                font-weight: bold;
+                text-decoration: underline;
+            }
+        </style>
+        <meta charset="utf-8">
+        
+        
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+        
+
+
+
+
+
+          <div class="bk-root" id="8e5c63e2-2728-4cc3-8a06-b6c201d265f2" data-root-id="1189"></div>
+
+        
+        <script type="application/json" id="1190">
+          {"d0501b5b-b8db-4fb8-ac35-4f9132ed281c":{"defs":[],"roots":{"references":[{"attributes":{"children":[{"id":"1187"},{"id":"1188"}]},"id":"1189","type":"Row"},{"attributes":{"text":"&lt;div class=\"config-display-title\"&gt;Config Summary&lt;/div&gt;&lt;div class=\"config-display-item\"&gt;&lt;span class=\"config-display-key\"&gt;result: &lt;/span&gt;Gen by timeslice national (GW)&lt;/div&gt;"},"id":"1188","type":"Div"},{"attributes":{},"id":"1187","type":"Div"}],"root_ids":["1189"]},"title":"Bokeh Application","version":"2.4.2"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            const fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  const docs_json = document.getElementById('1190').textContent;
+                  const render_items = [{"docid":"d0501b5b-b8db-4fb8-ac35-4f9132ed281c","root_ids":["1189"],"roots":{"1189":"8e5c63e2-2728-4cc3-8a06-b6c201d265f2"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    let attempts = 0;
+                    const timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        clearInterval(timer);
+                        embed_document(root);
+                      } else {
+                        attempts++;
+                        if (attempts > 100) {
+                          clearInterval(timer);
+                          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        }
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    </body>
+</html>

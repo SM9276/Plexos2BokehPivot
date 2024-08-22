@@ -25,6 +25,7 @@
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
+			"Dim4": "month",
             "Val": "Generation (GWh)"
         }
     },
