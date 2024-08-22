@@ -106,6 +106,7 @@ GL = {'df_source':None, 'df_plots':None, 'columns':None, 'data_source_wdg':None,
 
 #os globals
 this_dir_path = os.path.dirname(os.path.realpath(__file__))
+runs_path = os.path.dirname(this_dir_path) + r'\runs'
 out_path = this_dir_path + '/out'
 
 def initialize():
@@ -118,7 +119,7 @@ def initialize():
     wdg_config = {}
     args = bio.curdoc().session_context.request.arguments
     wdg_arr = args.get('widgets')
-    data_source = ''
+    data_source = runs_path
     data_type = DEFAULT_DATA_TYPE
     reset_wdg_defaults()
     if wdg_arr is not None:
@@ -134,7 +135,7 @@ def initialize():
     GL['plots'] = bl.column([], css_classes=['plots_section'])
     layout = bl.row(GL['controls'], GL['plots'], css_classes=['full_layout'])
 
-    if data_source != '':
+    if data_source != runs_path:
         update_data_source(init_load=True, init_config=wdg_config)
         set_wdg_col_options()
         update_plots()
@@ -387,7 +388,7 @@ def preset_wdg(preset, download_full_source=False):
     #finally, set x, which will trigger the data and chart updates.
     wdg['x'].value = preset['x']
 
-def build_data_source_wdg(data_type=DEFAULT_DATA_TYPE, data_source=''):
+def build_data_source_wdg(data_type=DEFAULT_DATA_TYPE, data_source=runs_path):
     '''
     Return the initial data source widget, prefilled with an input data_source
     Args:
