@@ -3,7 +3,7 @@ input_folder,PlexosSolutions/,,PlexosSolutions/
 output_folder,PlexosOutputs/,,PlexosOutputs/
 database_name,,,Constellation_db
 collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators Emissions Batteries
-run_in_parallel,no,,yes
+run_in_parallel,no,,no
 Batteries_filename,Batteries,,Batteries
 EmissionGenerators_filename,EmissionGenerators,,EmissionGenerators
 Emissions_filename,Emissions,,Emissions
@@ -16,7 +16,7 @@ Regions_filename,Regions,,Regions
 Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 EmissionGenerators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
 Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
-Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 Hubs_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 Interfaces_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month
 Lines_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month

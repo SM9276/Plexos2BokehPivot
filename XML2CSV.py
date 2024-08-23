@@ -149,7 +149,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
     
     #QueryToCSV Inputs
     append         = False
-    simulation     = SimulationPhaceEnum.LTPlan
+    simulation     = SimulationPhaseEnum.LTPlan
     periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
     collectionEnum = int(getattr(CollectionEnum, f'System{collection}') if collection != 'EmissilnGenerators' else CollectionEnum.EmissionGenerators)
     parentName     = "" 
@@ -199,16 +199,17 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                     TS0 = current_date.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
                     TS1 = end_of_year.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
 
-                    start = getattr(getattr(System, "DateTime"), "Parse")(TS0),  # Object DateFrom[ = None],
-                    end = getattr(getattr(System, "DateTime"), "Parse")(TS1),  # Object DateTo[ = None],
+                    start = getattr(getattr(System, "DateTime"), "Parse")(TS0)  # Object DateFrom[ = None],
+                    end = getattr(getattr(System, "DateTime"), "Parse")(TS1) # Object DateTo[ = None],
                     print(f'Processing data from {TS0} to {TS1}...')
 
                     # Dynamically generate output CSV file path based on partition time range
-                    output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
+                    # output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
+                    output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
 
                     sol.QueryToCSV(
                         output_csv_file,  # String
-                        append,           # Boolean
+                        True,           # Boolean
                         simulation,       # SimulationPhaseEnum
                         collectionEnum,   # Int32
                         parentName,       # String
@@ -250,7 +251,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
                 sol.QueryToCSV(
                         output_csv_file,  # String
-                        append,           # Boolean
+                        True,             # Boolean
                         simulation,       # SimulationPhaseEnum
                         collectionEnum,   # Int32
                         parentName,       # String
