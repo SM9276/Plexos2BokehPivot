@@ -104,5 +104,14 @@
             "Dim4": "year",
             "Val": "Installed Capacity (MWh)"
         }
-    }
+    },
+	"bat_load":{
+        "original_file": "Batteries.csv",
+        "dimensions": {
+            "Dim1": "category_name",
+            "Dim2": "p1",
+            "Dim3": "year",
+            "Dim4": "month",
+			"Val": "Installed Capacity (MWh)"	
+	}
 }

@@ -26,6 +26,7 @@ from PLEXOSCommon.Enums import *
 from System import DateTime
 from System import *
 
+
 def find_horizon(sol_file, print_enabled=False):
     """
     Function to find a model's horizon of dates in the XML file within a specified zip file.
@@ -43,10 +44,9 @@ def find_horizon(sol_file, print_enabled=False):
         xml_file = None  # Initialize xml_file variable outside the loop
 
         for name in list_of_files_in_zip:
-            if name.endswith(f"Solution.xml"):
+            if name.endswith("Solution.xml"):
                 xml_file = name
                 break  # Break out of loop once file is found
-        
         if not xml_file:
             print(f"No XML file found in {sol_file}")
             return None, None
@@ -94,9 +94,11 @@ def find_horizon(sol_file, print_enabled=False):
 
     return date_from, date_to
 
+
 # Read config from CSV file
 basedir = os.getcwd()
 config = pd.read_csv(os.path.join(basedir, 'config.csv')).fillna(0)
+
 
 def get_config_value(assumption, default=None):
     """
@@ -113,6 +115,7 @@ def get_config_value(assumption, default=None):
     if value == 0:
         value = config[config['assumption'] == assumption]['default value'].reset_index(drop=True).values[0]
     return value if value != 0 else default
+
 
 def process_collection(collection, input_folder, output_folder, sol_files, date_from=None, date_to=None):
     """
@@ -136,7 +139,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
     for sol_file in sol_files:
         sol_file_path = os.path.join(input_folder, sol_file)
         print(sol_file_path)
-        
+
         # Use the output_folder directly instead of creating a /runs/ subfolder
         solution_name = os.path.splitext(sol_file)[0]
         solution_output_folder = os.path.join(output_folder, solution_name)
@@ -150,7 +153,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
                 date_from, date_to = find_horizon(sol_file_path)
                 print(f"horizon dates: {date_from}, {date_to}")
-                
+
                 # Partition data by month
                 current_date = date_from
 
@@ -170,9 +173,11 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
                     sol.QueryToCSV(
                         output_csv_file,  # String strCSVFile,
-                        False,  # Boolean bAppendToFile,   Use 'True' to append to the file
+
+                        False,  # Boolean bAppendToFile,   Use 'True' to append to the file 
                         SimulationPhaseEnum.LTPlan,
-                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators,  # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
+                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissilnGenerators' else CollectionEnum.EmissionGenerators,  
+                        # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
                         '',  # String ParentName,
                         '',  # String ChildName,
                         getattr(PeriodEnum, f'{period_enum_value}'),  # PeriodEnum PeriodTypeId,
@@ -246,12 +251,13 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
             # Important to Close() the Solution to clear working storage.
             sol.Close()
 
+
 # Get collections from the config file
 collections_str = get_config_value('collections')
 collections = collections_str.split() if collections_str else []
 
 # Declare the collections to process
-print(f'Collections to process: ')
+print('Collections to process: ')
 for collection in collections:
     print(collection)
 
@@ -269,8 +275,8 @@ if not check_sol_files or check_sol_files == [0]:
 else:
     # Convert the list of filenames to strings
     sol_files = [str(filename) for filename in check_sol_files]
-    
 # Read the parallel execution decision from the config file
+
 run_in_parallel = get_config_value('run_in_parallel').lower() == 'yes'
 
 # Check if there are no solution files
