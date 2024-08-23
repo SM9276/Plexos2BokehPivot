@@ -155,64 +155,63 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 print(f"horizon dates: {date_from}, {date_to}")
 
                 # Partition data by month
-                current_date = date_from
+                # current_date = date_from
 
-                while current_date <= date_to:
-                    end_of_month = (current_date + relativedelta(months=1)) - timedelta(hours=1)
+                # while current_date <= date_to:
+                    # end_of_month = (current_date + relativedelta(months=1)) - timedelta(hours=1)
 
-                    if end_of_month > date_to:
-                        end_of_month = date_to
+                    # if end_of_month > date_to:
+                        # end_of_month = date_to
 
-                    TS0 = current_date.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
-                    TS1 = end_of_month.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+                TS0 = date_from.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+                TS1 = date_to.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
 
-                    print(f'Processing data from {TS0} to {TS1}...')
+                print(f'Processing data from {TS0} to {TS1}...')
 
-                    # Dynamically generate output CSV file path based on partition time range
-                    output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
+                # Dynamically generate output CSV file path based on partition time range
+                output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
 
-                    sol.QueryToCSV(
-                        output_csv_file,  # String strCSVFile,
-
-                        False,  # Boolean bAppendToFile,   Use 'True' to append to the file 
-                        SimulationPhaseEnum.LTPlan,
-                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators'' else CollectionEnum.EmissionGenerators,  
-                        # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
-                        '',  # String ParentName,
-                        '',  # String ChildName,
-                        getattr(PeriodEnum, f'{period_enum_value}'),  # PeriodEnum PeriodTypeId,
-                        SeriesTypeEnum.Properties,  # SeriesTypeEnum SeriesTypeId,
-                        '',  # String PropertyList[ = None], 
-                        getattr(getattr(System, "DateTime"), "Parse")(TS0),  # Object DateFrom[ = None],
-                        getattr(getattr(System, "DateTime"), "Parse")(TS1),  # Object DateTo[ = None],
-                        '',
-                        '',
-                        '',
-                        AggregationTypeEnum.periodAggregation,
-                        '',
-                        '',
-                        OperationTypeEnum.Sum
-                    )
+                sol.QueryToCSV(
+                    output_csv_file,  # String strCSVFile,
+                    False,  # Boolean bAppendToFile,   Use 'True' to append to the file 
+                    SimulationPhaseEnum.LTPlan,
+                    getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators,  
+                    # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
+                    '',  # String ParentName,
+                    '',  # String ChildName,
+                    getattr(PeriodEnum, f'{period_enum_value}'),  # PeriodEnum PeriodTypeId,
+                    SeriesTypeEnum.Properties,  # SeriesTypeEnum SeriesTypeId,
+                    '',  # String PropertyList[ = None], 
+                    getattr(getattr(System, "DateTime"), "Parse")(TS0),  # Object DateFrom[ = None],
+                    getattr(getattr(System, "DateTime"), "Parse")(TS1),  # Object DateTo[ = None],
+                    '',
+                    '',
+                    '',
+                    AggregationTypeEnum.periodAggregation,
+                    '',
+                    '',
+                    OperationTypeEnum.Sum
+                )
 
                     # Read the generated CSV file to add new columns
-                    df_bat = pd.read_csv(output_csv_file)
+                df_bat = pd.read_csv(output_csv_file)
 
-                    if '_date' in df_bat.columns:
-                        # Extract year, hour, and month from the _date column
-                        df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
-                        df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]
-                        df_bat['month'] = df_bat['_date'].str.split('/').str[0]
+                if '_date' in df_bat.columns:
+                    # Extract year, hour, and month from the _date column
+                    df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
+                    df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]
+                    df_bat['month'] = df_bat['_date'].str.split('/').str[0]
 
-                        # Save the updated DataFrame back to the same CSV file
-                        df_bat.to_csv(output_csv_file, index=False)
+                    # Save the updated DataFrame back to the same CSV file
+                    df_bat.to_csv(output_csv_file, index=False)
 
-                    # Convert absolute path to relative path
-                    relative_sol_file_path = os.path.relpath(sol_file_path, input_folder)
-                    relative_output_csv_file = os.path.relpath(output_csv_file, solution_output_folder)
+                # Convert absolute path to relative path
+                relative_sol_file_path = os.path.relpath(sol_file_path, input_folder)
+                relative_output_csv_file = os.path.relpath(output_csv_file, solution_output_folder)
 
-                    print(f'Results from {relative_sol_file_path} saved to {relative_output_csv_file} for {current_date} to {end_of_month}')
+                print(f'Results from {relative_sol_file_path} saved to {relative_output_csv_file} for {current_date} to {end_of_month}')
 
-                    current_date += relativedelta(months=1)
+                    # current_date += relativedelta(months=1)
             else:
                 # Run the query as before for non-Interval periods
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
