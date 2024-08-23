@@ -138,17 +138,17 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
             propertyList = "2,240"
             pass
         case "Batteries":
-            propertyList = ""
+            propertyList = "5,6,82"
             pass
         case "Emmisions":
-            propertyList = ""
+            propertyList = "1"
             pass
         case _:
             propertyList = ""
             pass
     
     #QueryToCSV Inputs
-    append         = False
+    append         = True
     simulation     = SimulationPhaseEnum.LTPlan
     periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
     collectionEnum = int(getattr(CollectionEnum, f'System{collection}') if collection != 'EmissilnGenerators' else CollectionEnum.EmissionGenerators)
@@ -209,7 +209,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
                     sol.QueryToCSV(
                         output_csv_file,  # String
-                        True,           # Boolean
+                        append,           # Boolean
                         simulation,       # SimulationPhaseEnum
                         collectionEnum,   # Int32
                         parentName,       # String
@@ -247,6 +247,12 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
                     current_date += relativedelta(years=1)
             else:
+                date_from, date_to = find_horizon(sol_file_path)
+                TS0 = date_from.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+                TS1 = date_to.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+
+                start = getattr(getattr(System, "DateTime"), "Parse")(TS0)  # Object DateFrom[ = None],
+                end = getattr(getattr(System, "DateTime"), "Parse")(TS1) # Object DateTo[ = None],
                 # Run the query as before for non-Interval periods
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
                 sol.QueryToCSV(
