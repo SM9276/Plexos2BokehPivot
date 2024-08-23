@@ -176,7 +176,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
                         False,  # Boolean bAppendToFile,   Use 'True' to append to the file 
                         SimulationPhaseEnum.LTPlan,
-                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissilnGenerators' else CollectionEnum.EmissionGenerators,  
+                        getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators'' else CollectionEnum.EmissionGenerators,  
                         # CollectionEnum CollectionId, note: all collections are prefixed with 'System' except for EmissionGenerators
                         '',  # String ParentName,
                         '',  # String ChildName,
@@ -185,6 +185,13 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                         '',  # String PropertyList[ = None], 
                         getattr(getattr(System, "DateTime"), "Parse")(TS0),  # Object DateFrom[ = None],
                         getattr(getattr(System, "DateTime"), "Parse")(TS1),  # Object DateTo[ = None],
+                        '',
+                        '',
+                        '',
+                        AggregationTypeEnum.periodAggregation,
+                        '',
+                        '',
+                        OperationTypeEnum.Sum
                     )
 
                     # Read the generated CSV file to add new columns

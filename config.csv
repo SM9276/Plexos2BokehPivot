@@ -3,7 +3,7 @@ input_folder,PlexosSolutions/,,PlexosSolutions/
 output_folder,PlexosOutputs/,,PlexosOutputs/
 database_name,,,Constellation_db
 collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators Emissions Batteries
-run_in_parallel,no,,no
+run_in_parallel,no,,yes
 Batteries_filename,Batteries,,Batteries
 EmissionGenerators_filename,EmissionGenerators,,EmissionGenerators
 Emissions_filename,Emissions,,Emissions

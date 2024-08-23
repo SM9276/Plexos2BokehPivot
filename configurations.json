@@ -113,5 +113,6 @@
             "Dim3": "year",
             "Dim4": "month",
 			"Val": "Installed Capacity (MWh)"	
-	}
+	    }
+    }
 }

@@ -1208,10 +1208,10 @@ columns_meta = {
     #     'style': this_dir_path + '/in/reeds2/m_style.csv',
     # },
     'month':{
-        'type':'number'
+        'type':'number',
         'filterable': True,
-        'serieable' : True;
-        },
+        'serieable' : True,
+    },
     'year':{
         'type':'number',
         'filterable': True,
