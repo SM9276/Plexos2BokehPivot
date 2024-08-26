@@ -65,6 +65,80 @@ def scale_column_filtered(df, **kw):
     df.loc[cond, kw['change_column']] = df.loc[cond, kw['change_column']] * kw['scale_factor']
     return df
 
+def sum_over_hours(df, **kw):
+    # Determine group columns
+    group_cols = kw['group_cols'][:]
+    if 'year_col' in kw:
+        group_cols.append(kw['year_col'])
+    if 'month_col' in kw:
+        group_cols.append(kw['month_col'])
+    if 'day_col' in kw:
+        group_cols.append(kw['day_col'])
+    if 'hour_col' in kw:
+        group_cols.append(kw['hour_col'])
+    
+    # Drop unnecessary columns
+    if 'val_cols' in kw:
+        drop_cols = [c for c in df.columns if c not in group_cols + kw['val_cols']]
+    elif 'drop_cols' in kw:
+        drop_cols = kw['drop_cols']
+    else:
+        drop_cols = []
+
+    df = df.drop(drop_cols, axis='columns', errors='ignore')
+
+    # Group by the specified columns and sum
+    df = df.groupby(group_cols, sort=False, as_index=False).sum()
+
+    return df
+
+def sum_over_days(df, **kw):
+    # Determine group columns
+    group_cols = kw['group_cols'][:]
+    if 'year_col' in kw:
+        group_cols.append(kw['year_col'])
+    if 'month_col' in kw:
+        group_cols.append(kw['month_col'])
+    if 'day_col' in kw:
+        group_cols.append(kw['day_col'])
+    
+    # Drop unnecessary columns
+    if 'val_cols' in kw:
+        drop_cols = [c for c in df.columns if c not in group_cols + kw['val_cols']]
+    elif 'drop_cols' in kw:
+        drop_cols = kw['drop_cols']
+    else:
+        drop_cols = []
+
+    df = df.drop(drop_cols, axis='columns', errors='ignore')
+
+    # Group by the specified columns and sum
+    df = df.groupby(group_cols, sort=False, as_index=False).sum()
+
+    return df
+
+def sum_over_months(df, **kw):
+    # Handle month-based grouping
+    if 'month_col' in kw:
+        group_cols = kw['group_cols'] + [kw['month_col']]
+    else:
+        group_cols = kw['group_cols']
+
+    if 'val_cols' in kw:
+        drop_cols = [c for c in df.columns if c not in group_cols + kw['val_cols']]
+    elif 'drop_cols' in kw:
+        drop_cols = kw['drop_cols']
+    else:
+        drop_cols = []
+
+    df = df.drop(drop_cols, axis='columns', errors='ignore')
+
+    # Group by year, month (if provided), and any other specified columns
+    df = df.groupby(group_cols, sort=False, as_index=False).sum()
+
+    return df
+
+
 def sum_over_cols(df, **kw):
     if 'val_cols' in kw:
         drop_cols = [c for c in df.columns if c not in kw['group_cols']+kw['val_cols']]
@@ -1207,6 +1281,11 @@ columns_meta = {
     #     'map': this_dir_path + '/in/reeds2/m_map.csv',
     #     'style': this_dir_path + '/in/reeds2/m_style.csv',
     # },
+    'day':{
+        'type':'number',
+        'filterable': True,
+        'serieable' : True,
+    },
     'month':{
         'type':'number',
         'filterable': True,
@@ -1461,35 +1540,62 @@ results_meta = collections.OrderedDict((
 
     ('Generation National (TWh)',
         {'file':'gen_ann.csv',
-        'columns': ['tech', 'rb', 'year', 'Generation (TWh)'],
+        'columns': ['tech', 'rb', 'year', 'month', 'Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_cols, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year']}},
+            {'func': sum_over_cols, 'args': {'drop_cols': ['rb','month'], 'group_cols': ['tech', 'year']}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
         'index': ['tech', 'year'],
         'presets': collections.OrderedDict((
             ('Stacked Area',{'x':'year', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Area'}),
             ('Stacked Bars',{'x':'year', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
-            ('Stacked Bars Gen Frac',{'x':'year', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75', 'adv_op':'Ratio', 'adv_col':'tech', 'adv_col_base':'Total'}),
+            ('Stacked Bars Gen Frac',{'x':'year', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1', 'adv_op':'Ratio', 'adv_col':'tech', 'adv_col_base':'Total'}),
             ('Explode By Tech',{'x':'year', 'y':'Generation (TWh)', 'series':'scenario', 'explode':'tech', 'chart_type':'Line'}),
         )),
         }
     ),
 
-    ('Generation National(PLEXOS)',
+    ('Generation National Month',
         {'file':'gen_ann.csv',
         'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_cols, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year','month']}},
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
-        'index': ['tech', 'year'],
+        'index': ['tech','year','month'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars(years)',{'x':'year', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
-            ('Stacked Bars(monthes)',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
         )),
         }
      ),
+    
+    ('Generation National Day',
+        {'file':'gen_ann.csv',
+        'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
+        'preprocess': [
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
+        ],
+        'index': ['tech','year','month'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+        )),
+        }
+     ),
+    ('Generation National hour',
+        {'file':'gen_ann.csv',
+        'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
+        'preprocess': [
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
+        ],
+        'index': ['tech','year','month'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+        )),
+        }
+     ),
+
 
     ('Generation National with Uncurt and Load (TWh)',
         {'sources': [
