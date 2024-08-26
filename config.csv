@@ -1,9 +1,8 @@
 assumption,default value,default action description,value
 input_folder,PlexosSolutions/,,PlexosSolutions/
 output_folder,PlexosOutputs/,,PlexosOutputs/
-database_name,,,Constellation_db
-collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators Emissions Batteries
-run_in_parallel,no,,no
+collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Emissions Batteries
+run_in_parallel,no,,yes
 Batteries_filename,Batteries,,Batteries
 EmissionGenerators_filename,EmissionGenerators,,EmissionGenerators
 Emissions_filename,Emissions,,Emissions
@@ -13,9 +12,9 @@ Interfaces_filename,Interfaces,,Interfaces
 Lines_filename,Lines,,Lines
 Nodes_filename,Nodes,,Nodes
 Regions_filename,Regions,,Regions
-Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Batteries_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 EmissionGenerators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
-Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",FiscalYear
+Emissions_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 Generators_periodEnum,FiscalYear,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 Hubs_periodEnum,Interval,"Interval for hourly, Month for monthly and FiscalYear for annual",Interval
 Interfaces_periodEnum,Month,"Interval for hourly, Month for monthly and FiscalYear for annual",Month
