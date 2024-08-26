@@ -151,7 +151,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
     append         = True
     simulation     = SimulationPhaseEnum.LTPlan
     periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
-    collectionEnum = int(getattr(CollectionEnum, f'System{collection}') if collection != 'EmissilnGenerators' else CollectionEnum.EmissionGenerators)
+    collectionEnum = int(getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators)
     parentName     = "" 
     childName      = ""
     seriesEnum     = SeriesTypeEnum.Properties
@@ -257,7 +257,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
                 sol.QueryToCSV(
                         output_csv_file,  # String
-                        True,             # Boolean
+                        append,            # Boolean
                         simulation,       # SimulationPhaseEnum
                         collectionEnum,   # Int32
                         parentName,       # String
