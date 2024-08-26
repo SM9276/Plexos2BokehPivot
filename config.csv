@@ -1,8 +1,8 @@
 assumption,default value,default action description,value
 input_folder,PlexosSolutions/,,PlexosSolutions/
 output_folder,PlexosOutputs/,,PlexosOutputs/
-collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Emissions Batteries
-run_in_parallel,no,,yes
+collections,EmissionGenerators Interfaces Generators Nodes Regions Hubs Lines Emissions,,Generators
+run_in_parallel,no,,no
 Batteries_filename,Batteries,,Batteries
 EmissionGenerators_filename,EmissionGenerators,,EmissionGenerators
 Emissions_filename,Emissions,,Emissions

@@ -1,24 +1,4 @@
 {
-    "gen_h": {
-        "original_file": "Generators.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "p1",
-            "Dim3": "h1",
-            "Dim4": "year",
-            "Val": "Generation (GWh)"
-        }
-    },
-    "gen_ivrt": {
-        "original_file": "Generators.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "child_name",
-            "Dim3": "p1",
-            "Dim4": "year",
-            "Val": "Generation (GWh)"
-        }
-    },
     "gen_ann": {
         "original_file": "Generators.csv",
         "dimensions": {
@@ -47,42 +27,13 @@
             "Val": "Installed Capacity (MW)"
         }
     },
-    "cap_ivrt": {
-        "original_file": "Generators.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "child_name",
-            "Dim3": "p1",
-            "Dim4": "year",
-            "Val": "Installed Capacity (MW)"
-        }
-    },
-    "gen_h_append": {
-        "original_file": "Batteries.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "p1",
-            "Dim3": "h1",
-            "Dim4": "year",
-            "Val": "Generation (GWh)"
-        }
-    },
-    "gen_ivrt_append": {
-        "original_file": "Batteries.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "child_name",
-            "Dim3": "p1",
-            "Dim4": "year",
-            "Val": "Generation (GWh)"
-        }
-    },
     "gen_ann_append": {
         "original_file": "Batteries.csv",
         "dimensions": {
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
+            "Dim4": "month",           
             "Val": "Generation (GWh)"
         }
     },
@@ -92,16 +43,6 @@
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
-            "Val": "Installed Capacity (MWh)"
-        }
-    },
-    "cap_ivrt_append": {
-        "original_file": "Batteries.csv",
-        "dimensions": {
-            "Dim1": "category_name",
-            "Dim2": "child_name",
-            "Dim3": "p1",
-            "Dim4": "year",
             "Val": "Installed Capacity (MWh)"
         }
     },

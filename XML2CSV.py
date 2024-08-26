@@ -287,11 +287,17 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 df_bat = pd.read_csv(output_csv_file)
 
                 if '_date' in df_bat.columns:
-                    # Extract year, hour, and month from the _date column
+                    # Extract the year, month, day, and hour using string splits
                     df_bat['year'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[2]
-                    df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0]
-                    df_bat['month'] = df_bat['_date'].str.split('/').str[0]
+                    df_bat['month'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[0]
+                    df_bat['day'] = df_bat['_date'].str.split(' ').str[0].str.split('/').str[1]
 
+                    # Extract the hour, adjusting for AM/PM format
+                    df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0].astype(int)
+                    df_bat['hour'] = df_bat.apply(
+                    lambda row: row['hour'] + 12 if 'PM' in row['_date'] and row['hour'] != 12 else (0 if 'AM' in row['_date'] and row['hour'] == 12 else row['hour']),
+                    axis=1  
+                    )
                     # Save the updated DataFrame back to the same CSV file
                     df_bat.to_csv(output_csv_file, index=False)
 
