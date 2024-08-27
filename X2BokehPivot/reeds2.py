@@ -1362,7 +1362,7 @@ results_meta = collections.OrderedDict((
              ('Stacked Bars',{'x':'year', 'y':'Capacity (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75'}),
              ('Stacked Bars - No H2',{'x':'year', 'y':'Capacity (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75', 'filter':{'tech':{'exclude':prod_techs}}}),
              ('Stacked Bars - Only H2',{'x':'year', 'y':'Capacity (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75', 'filter':{'tech':prod_techs}}),
-             ('Stacked Bars - Niche techs',{'x':'year', 'y':'Capacity (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75', 'filter':{'tech':niche_techs}}),
+             ('Stacked Bars - Niche techs',{'x':'near', 'y':'Capacity (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1.75', 'filter':{'tech':niche_techs}}),
              ('Explode By Tech',{'x':'year', 'y':'Capacity (GW)', 'series':'scenario', 'explode':'tech', 'chart_type':'Line'}),
              )),
          }
@@ -1538,6 +1538,60 @@ results_meta = collections.OrderedDict((
         }
     ),
 
+    ('Battery Load (Yearly)',
+        {'file':'bat_load.csv',
+        'columns': ['tech', 'rb', 'year', 'month','day','hour','Load (GW)'],
+        'preprocess': [
+            {'func': sum_over_cols, 'args': {'drop_cols': ['rb','month','day','hour'], 'group_cols': ['tech', 'year']}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Load (GW)'}},
+        ],
+        'index': ['tech', 'year'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'year', 'y':'Load (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+        )),
+        }
+    ),
+
+    ('Battery Load (Monthly)',
+        {'file':'bat_load.csv',
+        'columns': ['tech', 'rb', 'year', 'month','day','hour','Load (GW)'],
+        'preprocess': [
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb','day','hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Load (GW)'}},
+        ],
+        'index': ['tech', 'year','month'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'month', 'y':'Load (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter':{'year':'last'}}),
+        )),
+        }
+    ),
+    ('Battery Load (Daily)',
+        {'file':'bat_load.csv',
+        'columns': ['tech', 'rb', 'year', 'month','day','hour','Load (GW)'],
+        'preprocess': [
+            {'func': sum_over_days, 'args': {'drop_cols': ['rb','hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month','day_col': 'day'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Load (GW)'}},
+        ],
+        'index': ['tech', 'year','month','day'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'day', 'y':'Load (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter':{'year':'last','month':'last'}}),
+        )),
+        }
+    ),
+    ('Battery Load (Hourly)',
+        {'file':'bat_load.csv',
+        'columns': ['tech', 'rb', 'year', 'month','day','hour','Load (GW)'],
+        'preprocess': [
+            {'func': sum_over_hours, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month', 'day_col': 'day', 'hour_col':'hour'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Load (GW)'}},
+        ],
+        'index': ['tech', 'year','month','day'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars',{'x':'hour', 'y':'Load (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter':{'year':'last','month':'last','day':'last'}}),
+        )),
+        }
+    ),
+
     ('Generation National (TWh)',
         {'file':'gen_ann.csv',
         'columns': ['tech', 'rb', 'year', 'month','day','hour','Generation (TWh)'],
@@ -1564,7 +1618,7 @@ results_meta = collections.OrderedDict((
         ],
         'index': ['tech','year','month'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter': {'year':'last'}}),
         )),
         }
      ),
@@ -1578,10 +1632,11 @@ results_meta = collections.OrderedDict((
         ],
         'index': ['tech','year','month','day'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars',{'x':'day', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'day', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter':{'year':'last','month':'last'}}),
         )),
         }
      ),
+
     ('Generation National hour',
         {'file':'gen_ann.csv',
         'columns': ['tech', 'rb', 'year','month','day','hour','Generation (TWh)'],
@@ -1591,11 +1646,10 @@ results_meta = collections.OrderedDict((
         ],
         'index': ['tech','year','month','day','hour'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars',{'x':'hour', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'hour', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1', 'filter':{'year':'last','month':'last','day':'last'}}),
         )),
         }
      ),
-
 
     ('Generation National with Uncurt and Load (TWh)',
         {'sources': [
