@@ -1585,7 +1585,7 @@ results_meta = collections.OrderedDict((
             {'func': sum_over_hours, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month', 'day_col': 'day', 'hour_col':'hour'}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Load (GW)'}},
         ],
-        'index': ['tech', 'year','month','day'],
+        'index': ['tech', 'year','month','day','hour'],
         'presets': collections.OrderedDict((
             ('Stacked Bars',{'x':'hour', 'y':'Load (GW)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1','filter':{'year':'last','month':'last','day':'last'}}),
         )),
