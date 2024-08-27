@@ -1540,9 +1540,9 @@ results_meta = collections.OrderedDict((
 
     ('Generation National (TWh)',
         {'file':'gen_ann.csv',
-        'columns': ['tech', 'rb', 'year', 'month', 'Generation (TWh)'],
+        'columns': ['tech', 'rb', 'year', 'month','day','hour','Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_cols, 'args': {'drop_cols': ['rb','month'], 'group_cols': ['tech', 'year']}},
+            {'func': sum_over_cols, 'args': {'drop_cols': ['rb','month','day','hour'], 'group_cols': ['tech', 'year']}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
         'index': ['tech', 'year'],
@@ -1557,9 +1557,9 @@ results_meta = collections.OrderedDict((
 
     ('Generation National Month',
         {'file':'gen_ann.csv',
-        'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
+        'columns': ['tech', 'rb', 'year','month','day','hour','Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb','day','hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
         'index': ['tech','year','month'],
@@ -1571,27 +1571,27 @@ results_meta = collections.OrderedDict((
     
     ('Generation National Day',
         {'file':'gen_ann.csv',
-        'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
+        'columns': ['tech', 'rb', 'year','month','day','hour','Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': sum_over_days, 'args': {'drop_cols': ['rb','hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month','day_col': 'day'}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
-        'index': ['tech','year','month'],
+        'index': ['tech','year','month','day'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'day', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
         )),
         }
      ),
     ('Generation National hour',
         {'file':'gen_ann.csv',
-        'columns': ['tech', 'rb', 'year','month','Generation (TWh)'],
+        'columns': ['tech', 'rb', 'year','month','day','hour','Generation (TWh)'],
         'preprocess': [
-            {'func': sum_over_months, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': sum_over_hours, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month', 'day_col': 'day', 'hour_col':'hour'}},
             {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column':'Generation (TWh)'}},
         ],
-        'index': ['tech','year','month'],
+        'index': ['tech','year','month','day','hour'],
         'presets': collections.OrderedDict((
-            ('Stacked Bars',{'x':'month', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
+            ('Stacked Bars',{'x':'hour', 'y':'Generation (TWh)', 'series':'tech', 'explode':'scenario', 'chart_type':'Bar', 'bar_width':'1'}),
         )),
         }
      ),
