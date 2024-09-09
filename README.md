@@ -69,11 +69,19 @@ Welcome to PLEXOS2BokehPivot! This project converts PLEXOS XML solution files to
 1. **Open Bokeh Pivot:**
    - Navigate to the `X2BokehPivot` directory.
    - Run `launch.bat` to start Bokeh Pivot.
-   - When the browser opens, paste the path to the `runs` directory.
+   - When the browser opens, the path to the `runs` directory is selected
+   - remove a letter press enter and put the letter back and press enter
 
 2. **Load and Visualize Your Data:**
-   - Import the newly created CSV files from the `runs` folder into Bokeh Pivot.
    - Apply the visualization you selected to see your data represented effectively.
+   - By default the program selects the last year, month and day for hourly data.
+   - By default the program selects the last year, month for daily data.
+   - By default the program selects the last year, for monthly data. 
+
+Note that data will can only show data correctly if only 1 year, 1 month, 1 day is selcected since the hourly data will be concatnated.
+Same applies for the daily data, in this case its only 1 year and 1 month. Same aplies to monthly data, only one year at a time unless you 'explode' by year.
+
+
 
 3. **Customize Visualizations:**
    - To customize the colors of technologies, go to `X2BokehPivot/in/reeds2` and modify the `tech_style.csv` file.
