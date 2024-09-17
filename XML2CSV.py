@@ -175,7 +175,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
 
         # Use the output_folder directly instead of creating a /runs/ subfolder
         solution_name = os.path.splitext(sol_file)[0]
-        solution_output_folder = os.path.join(output_folder, solution_name)
+        solution_output_folder = os.path.join(output_folder + f"{period_enum_value}", solution_name)
         os.makedirs(solution_output_folder, exist_ok=True)
 
         sol.Connection(sol_file_path)

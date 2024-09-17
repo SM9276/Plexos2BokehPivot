@@ -8,7 +8,7 @@
 			"Dim4": "month",
             "Dim5": "day",
             "Dim6": "hour",
-            "Val": "Generation (MW)"
+            "Val": "Generation (GWh)"
         }
     },
     "emit_r": {
