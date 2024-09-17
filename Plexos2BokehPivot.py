@@ -139,17 +139,16 @@ def execute_mode():
                     value_col = dimensions["Val"]
                     
                     # Extract the term before parentheses if present
-                    if value_col in df.columns:
-                        col_name_before_parens = re.split(r' \(', value_col)[0]  # Extract part before '('
-                        matching_columns = [col for col in df.columns if col_name_before_parens in col]
-                        if matching_columns:
-                            # Use the first matching column in the list
-                            new_df['Val'] = df[matching_columns[0]]
-                        else:
-                            print(f"Warning: No matching column found for '{value_col}' in {file_name}.")
+                    col_name_before_parens = re.split(r'\s*\(', value_col)[0].strip()
+                    
+                    # Find the matching column in the CSV based on the extracted term
+                    matching_columns = [col for col in df.columns if col_name_before_parens in col]
+                    if matching_columns:
+                        # Use the first matching column in the list
+                        new_df['Val'] = df[matching_columns[0]]
                     else:
-                        # Handle constant string
-                        new_df['Val'] = [value_col] * len(df)
+                        print(f"Warning: No matching column found for '{value_col}' in {file_name}.")
+                        continue
 
                 # Determine the output folder structure (recreate full path structure)
                 relative_folder = os.path.relpath(os.path.dirname(full_path), INPUT_FOLDER)
