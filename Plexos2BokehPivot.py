@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import json
+import re
 
 CONFIG_FILE = 'configurations.json'
 INPUT_FOLDER = 'PlexosOutputs'
@@ -136,8 +137,16 @@ def execute_mode():
                 # Add value column to new DataFrame
                 if "Val" in dimensions:
                     value_col = dimensions["Val"]
+                    
+                    # Extract the term before parentheses if present
                     if value_col in df.columns:
-                        new_df['Val'] = df[value_col]
+                        col_name_before_parens = re.split(r' \(', value_col)[0]  # Extract part before '('
+                        matching_columns = [col for col in df.columns if col_name_before_parens in col]
+                        if matching_columns:
+                            # Use the first matching column in the list
+                            new_df['Val'] = df[matching_columns[0]]
+                        else:
+                            print(f"Warning: No matching column found for '{value_col}' in {file_name}.")
                     else:
                         # Handle constant string
                         new_df['Val'] = [value_col] * len(df)
@@ -152,10 +161,9 @@ def execute_mode():
                 new_df.to_csv(new_csv, index=False)
                 print(f"New CSV file created: {new_csv}")
 
-        # This part handles cases where there is no configuration for the current file
+        # Handle cases where there is no configuration for the current file
         if not any(config["original_file"] == file_name for config in configurations.values()):
             print(f"Warning: Configuration for '{file_name}' not found in the configurations.")
-
 
 def main():
     mode = input("Enter mode (Mapping/Execute): ").strip().lower()

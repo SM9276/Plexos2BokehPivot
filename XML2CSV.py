@@ -173,9 +173,16 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
         sol_file_path = os.path.join(input_folder, sol_file)
         print(sol_file_path)
 
-        # Use the output_folder directly instead of creating a /runs/ subfolder
         solution_name = os.path.splitext(sol_file)[0]
         solution_output_folder = os.path.join(output_folder + f"{period_enum_value}", solution_name)
+
+	    # Define the solution file path
+        solution_file_path = os.path.join(solution_output_folder, sol_file)
+
+	    # Check if the solution file exists, delete it if it does
+        if os.path.exists(solution_file_path):
+            os.remove(solution_file_path)  # Deletes the specific solution file
+
         os.makedirs(solution_output_folder, exist_ok=True)
 
         sol.Connection(sol_file_path)
