@@ -142,12 +142,11 @@ def execute_mode():
                         # Handle constant string
                         new_df['Val'] = [value_col] * len(df)
 
-                # Determine the output folder structure
-                original_folder = os.path.dirname(full_path)
-                relative_folder = os.path.relpath(original_folder, INPUT_FOLDER)
-                model_folder = os.path.basename(relative_folder)
-                output_folder = os.path.join(OUTPUT_FOLDER, model_folder, 'outputs')
+                # Determine the output folder structure (recreate full path structure)
+                relative_folder = os.path.relpath(os.path.dirname(full_path), INPUT_FOLDER)
+                output_folder = os.path.join(OUTPUT_FOLDER, relative_folder)
                 
+                # Create the new CSV file
                 new_csv = os.path.join(output_folder, f"{new_file_name}.csv")
                 os.makedirs(os.path.dirname(new_csv), exist_ok=True)
                 new_df.to_csv(new_csv, index=False)
