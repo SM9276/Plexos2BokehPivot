@@ -1367,6 +1367,61 @@ results_meta = collections.OrderedDict((
              )),
          }
      ),
+    ('Capacity National (Yearly)',
+    	{'file': 'cap.csv',
+    	'columns': ['tech', 'rb', 'year', 'month', 'day', 'hour', 'Capacity (GW)'],
+    	'preprocess': [
+       	{'func': sum_over_cols, 'args': {'drop_cols': ['rb', 'month', 'day', 'hour'], 'group_cols': ['tech', 'year']}},
+        {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column': 'Capacity (GW)'}},
+    	],
+    	'index': ['tech', 'year'],
+    	'presets': collections.OrderedDict((
+        ('Stacked Bars', {'x': 'year', 'y': 'Capacity (GW)', 'series': 'tech', 'explode': 'scenario', 'chart_type': 'Bar', 'bar_width': '1'}),
+    )),
+    }
+	),
+
+    ('Capacity National (Monthly)',
+        {'file': 'cap.csv',
+        'columns': ['tech', 'rb', 'year', 'month', 'day', 'hour', 'Capacity (GW)'],
+        'preprocess': [
+            {'func': sum_over_months, 'args': {'drop_cols': ['rb', 'day', 'hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month'}},
+            {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column': 'Capacity (GW)'}},
+        ],
+        'index': ['tech', 'year', 'month'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars', {'x': 'month', 'y': 'Capacity (GW)', 'series': 'tech', 'explode': 'scenario', 'chart_type': 'Bar', 'bar_width': '1', 'filter': {'year': 'last'}}),
+        )),
+    }
+    ),
+
+('Capacity National (Daily)',
+    {'file': 'cap.csv',
+    'columns': ['tech', 'rb', 'year', 'month', 'day', 'hour', 'Capacity (GW)'],
+    'preprocess': [
+        {'func': sum_over_days, 'args': {'drop_cols': ['rb', 'hour'], 'group_cols': ['tech', 'year'], 'month_col': 'month', 'day_col': 'day'}},
+        {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column': 'Capacity (GW)'}},
+    ],
+    'index': ['tech', 'year', 'month', 'day'],
+    'presets': collections.OrderedDict((
+        ('Stacked Bars', {'x': 'day', 'y': 'Capacity (GW)', 'series': 'tech', 'explode': 'scenario', 'chart_type': 'Bar', 'bar_width': '1', 'filter': {'year': 'last', 'month': 'last'}}),
+    )),
+    }
+),
+
+('Capacity National (Hourly)',
+    {'file': 'cap.csv',
+    'columns': ['tech', 'rb', 'year', 'month', 'day', 'hour', 'Capacity (GW)'],
+    'preprocess': [
+        {'func': sum_over_hours, 'args': {'drop_cols': ['rb'], 'group_cols': ['tech', 'year'], 'month_col': 'month', 'day_col': 'day', 'hour_col': 'hour'}},
+        {'func': scale_column, 'args': {'scale_factor': 1e-6, 'column': 'Capacity (GW)'}},
+    ],
+    'index': ['tech', 'year', 'month', 'day', 'hour'],
+    'presets': collections.OrderedDict((
+        ('Stacked Bars', {'x': 'hour', 'y': 'Capacity (GW)', 'series': 'tech', 'explode': 'scenario', 'chart_type': 'Bar', 'bar_width': '1', 'filter': {'year': 'last', 'month': 'last', 'day': 'last'}}),
+    )),
+    }
+),
 
     ('Capacity BA (GW)',
      {'file':'cap.csv',
