@@ -132,19 +132,24 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
     period_enum_key = f"{collection}_periodEnum"
     period_enum_value = get_config_value(period_enum_key)
     
+
     match collection:
-        case "Generators":
-            propertyList = "2,240"
-            pass
-        case "Batteries":
-            propertyList = "5,6,65"
-            pass
-        case "Emmisions":
-            propertyList = "1"
-            pass
-        case _:
-            propertyList = ""
-            pass
+    	case "Generators":
+        	propertyList = f"{int(getattr(SystemOutGeneratorsEnum, 'Generation'))},{int(getattr(SystemOutGeneratorsEnum, 'InstalledCapacity'))}"
+        
+    	case "Batteries":
+        	propertyList = f"{int(getattr(SystemOutBatteriesEnum, 'Generation'))},{int(getattr(SystemOutBatteriesEnum, 'Load'))},{int(getattr(SystemOutBatteriesEnum, 'InstalledCapacity')) - 4}"
+        
+    	case "Emmisions":
+        	propertyList = str(int(getattr(SystemOutEmissionsEnum, 'Production')))
+        
+    	case _:
+        	propertyList = ""
+
+    # Example output
+    print(propertyList)
+
+
 
     # QueryToCSV Inputs
     append         = True
