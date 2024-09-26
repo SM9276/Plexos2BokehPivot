@@ -137,7 +137,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
             propertyList = "2,240"
             pass
         case "Batteries":
-            propertyList = "5,6,78"
+            propertyList = "5,6,65"
             pass
         case "Emmisions":
             propertyList = "1"
