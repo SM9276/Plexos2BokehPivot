@@ -132,13 +132,12 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
     period_enum_key = f"{collection}_periodEnum"
     period_enum_value = get_config_value(period_enum_key)
     
-    
     match collection:
         case "Generators":
             propertyList = "2,240"
             pass
         case "Batteries":
-            propertyList = "5,6,82"
+            propertyList = "5,6,78"
             pass
         case "Emmisions":
             propertyList = "1"
@@ -146,8 +145,8 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
         case _:
             propertyList = ""
             pass
-    
-    #QueryToCSV Inputs
+
+    # QueryToCSV Inputs
     append         = True
     simulation     = SimulationPhaseEnum.LTPlan
     periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
@@ -176,10 +175,10 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
         solution_name = os.path.splitext(sol_file)[0]
         solution_output_folder = os.path.join(output_folder + f"{period_enum_value}", solution_name)
 
-	    # Define the solution file path
+        # Define the solution file path
         solution_file_path = os.path.join(solution_output_folder, sol_file)
 
-	    # Check if the solution file exists, delete it if it does
+        # Check if the solution file exists, delete it if it does
         if os.path.exists(solution_file_path):
             os.remove(solution_file_path)  # Deletes the specific solution file
 
@@ -211,8 +210,11 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                     print(f'Processing data from {TS0} to {TS1}...')
 
                     # Dynamically generate output CSV file path based on partition time range
-                    # output_csv_file = os.path.join(solution_output_folder, f'{collection}_{current_date.strftime("%Y-%m")}.csv')
                     output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
+
+                    # Delete the output CSV file if it already exists
+                    if os.path.exists(output_csv_file):
+                        os.remove(output_csv_file)
 
                     sol.QueryToCSV(
                         output_csv_file,  # String
@@ -246,8 +248,8 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                         # Extract the hour, adjusting for AM/PM format
                         df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0].astype(int)
                         df_bat['hour'] = df_bat.apply(
-                        lambda row: row['hour'] + 12 if 'PM' in row['_date'] and row['hour'] != 12 else (0 if 'AM' in row['_date'] and row['hour'] == 12 else row['hour']),
-                        axis=1  
+                            lambda row: row['hour'] + 12 if 'PM' in row['_date'] and row['hour'] != 12 else (0 if 'AM' in row['_date'] and row['hour'] == 12 else row['hour']),
+                            axis=1  
                         )
 
                         # Save the updated DataFrame back to the same CSV file
@@ -269,9 +271,14 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                 end = getattr(getattr(System, "DateTime"), "Parse")(TS1) # Object DateTo[ = None],
                 # Run the query as before for non-Interval periods
                 output_csv_file = os.path.join(solution_output_folder, f'{collection}.csv')
+
+                # Delete the output CSV file if it already exists
+                if os.path.exists(output_csv_file):
+                    os.remove(output_csv_file)
+
                 sol.QueryToCSV(
                         output_csv_file,  # String
-                        append,            # Boolean
+                        append,           # Boolean
                         simulation,       # SimulationPhaseEnum
                         collectionEnum,   # Int32
                         parentName,       # String
@@ -302,8 +309,8 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
                     # Extract the hour, adjusting for AM/PM format
                     df_bat['hour'] = df_bat['_date'].str.split(' ').str[1].str.split(':').str[0].astype(int)
                     df_bat['hour'] = df_bat.apply(
-                    lambda row: row['hour'] + 12 if 'PM' in row['_date'] and row['hour'] != 12 else (0 if 'AM' in row['_date'] and row['hour'] == 12 else row['hour']),
-                    axis=1  
+                        lambda row: row['hour'] + 12 if 'PM' in row['_date'] and row['hour'] != 12 else (0 if 'AM' in row['_date'] and row['hour'] == 12 else row['hour']),
+                        axis=1  
                     )
                     # Save the updated DataFrame back to the same CSV file
                     df_bat.to_csv(output_csv_file, index=False)
@@ -326,6 +333,7 @@ def process_collection(collection, input_folder, output_folder, sol_files, date_
         finally:
             # Important to Close() the Solution to clear working storage.
             sol.Close()
+
 
 
 # Get collections from the config file
