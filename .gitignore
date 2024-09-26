@@ -1,6 +1,8 @@
 CSV/
 X2BokehPivot/python_executable_path.txt
 python_executable_path.txt
-PlexosOutputs/
-runs/
-
+PlexosOutputs/*
+runs/*
+PlexosSolutions/*
+PlexosSolutions/Model RPS_000_SPS_000 Solution.zip
+PlexosSolutions/Model RPS_070_SPS_010 Solution.zip
