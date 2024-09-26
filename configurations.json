@@ -32,7 +32,7 @@
 			"Dim4": "month",
             "Dim5": "day",
             "Dim6": "hour",
-            "Val": "Capacity Built(MW)"
+            "Val": "Installed Capacity(MW)"
         }
     },
     "gen_ann_append": {
@@ -41,7 +41,7 @@
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
-			"Dim4": "month",
+	    "Dim4": "month",
             "Dim5": "day",
             "Dim6": "hour",
             "Val": "Generation (MW)"
@@ -53,10 +53,10 @@
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
-			"Dim4": "month",
+	    "Dim4": "month",
             "Dim5": "day",
             "Dim6": "hour",
-            "Val": "Capacity Built(MWh)"
+            "Val": "Installed Capacity(MWh)"
         }
     },
 	"bat_load":{
@@ -65,10 +65,10 @@
             "Dim1": "category_name",
             "Dim2": "p1",
             "Dim3": "year",
-			"Dim4": "month",
+	    "Dim4": "month",
             "Dim5": "day",
             "Dim6": "hour",
-			"Val": "Load (MW)"	
+	    "Val": "Load (MW)"	
 	    }
     }
 }
