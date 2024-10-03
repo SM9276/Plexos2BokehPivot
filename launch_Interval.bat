@@ -8,8 +8,8 @@ set INSTALL_PATH=%LOCALAPPDATA%\Miniforge3
 set ENV_NAME=xml2csv
 
 :: Set the paths to your Python scripts
-set PYTHON_SCRIPT=Generation_Interval.py
-set PYTHON_SCRIPT2=Interval.py
+set PYTHON_SCRIPT2=Generation_Interval.py
+set PYTHON_SCRIPT=Interval.py
 :: Activate Miniforge environment
 echo Activating Miniforge environment '%ENV_NAME%'...
 call "%INSTALL_PATH%\condabin\conda.bat" activate %ENV_NAME%
