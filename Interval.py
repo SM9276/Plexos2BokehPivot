@@ -182,6 +182,11 @@ def process_collection(collection, input_folder, output_folder, sol_files, prope
         sol_file_path = os.path.join(input_folder, sol_file)
         solution_name = os.path.splitext(sol_file)[0]
         solution_output_folder = os.path.join(output_folder, period_enum_value , solution_name, folder_name)
+        solution_file_path = os.path.join(solution_output_folder, output_filename)
+
+	    # Check if the solution file exists, delete it if it does
+        if os.path.exists(solution_file_path):
+            os.remove(solution_file_path)  # Deletes the specific solution file
 
         os.makedirs(solution_output_folder, exist_ok=True)
 
