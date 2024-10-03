@@ -27,6 +27,40 @@ from PLEXOSCommon.Enums import *
 from System import DateTime
 from System import *
 
+def append_files(output_folder):
+    """
+    Function to append '_append' files to their corresponding CSV files.
+    
+    Args:
+    - output_folder: Path to the output folder.
+    """
+    # Traverse the output folder
+    for root, dirs, files in os.walk(output_folder):
+        for file in files:
+            # Check for '_append' in the file name
+            if '_append' in file:
+                append_file_path = os.path.join(root, file)
+                original_file_path = append_file_path.replace('_append', '')
+
+                # Check if the original file exists
+                if os.path.exists(original_file_path):
+                    try:
+                        # Read the content of the _append file and the original file
+                        append_df = pd.read_csv(append_file_path)
+                        original_df = pd.read_csv(original_file_path)
+
+                        # Append the data
+                        combined_df = pd.concat([original_df, append_df])
+
+                        # Save back to the original file
+                        combined_df.to_csv(original_file_path, index=False)
+                        print(f"Appended {file} to {os.path.basename(original_file_path)}")
+
+                    except Exception as e:
+                        print(f"Error appending {file} to {os.path.basename(original_file_path)}: {e}")
+                else:
+                    print(f"Original file not found for {file}, skipping append.")
+
 def process_collection(collection, input_folder, output_folder, sol_files, property):
     """
     Function to process a collection of data and create specific files based on collection and property.
@@ -187,5 +221,7 @@ else:
             
             for property in properties:
                 process_collection(collection, input_folder, output_folder, sol_files, property)
+        print("Appending '_append' files to corresponding CSVs...")
+        append_files(output_folder)
     except Exception as e:
         print(f"Execution failed with error: {e}")
