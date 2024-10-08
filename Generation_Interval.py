@@ -117,6 +117,11 @@ def append_files(output_folder):
                 else:
                     print(f"Original file not found for {file}, skipping append.")
 
+import os
+import csv
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 def process_collection_chunk(collection, input_folder, output_folder, sol_files, propertyList, date_from=None, date_to=None):
     """
     Function to process a collection of data.
@@ -128,10 +133,10 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     - sol_files: List of solution files.
     """
     import System
-    
+
     period_enum_value = "Interval"
-    
-    #QueryToCSV Inputs
+
+    # QueryToCSV Inputs
     append         = True
     simulation     = SimulationPhaseEnum.LTPlan
     periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
@@ -146,6 +151,7 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     category       = ""
     seperator      = ","
     operation      = OperationTypeEnum.SUM
+
     if collection == "Batteries":
         if property == "5":
             output_filename = "gen_ann_append.csv"
@@ -169,7 +175,6 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
 
     # Common columns for all files
     columns = ["category_name", "p1", "year", "month", "day", "hour", "value"]
-    # Import the System namespace inside the function
     print(f"Processing collection '{collection}' with PeriodEnum {period_enum_value} and sol files: {sol_files}")
 
     sol = Solution()
@@ -181,22 +186,21 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
         folder_name = "Outputs"
         
         solution_name = os.path.splitext(sol_file)[0]
-        solution_output_folder = os.path.join(output_folder, period_enum_value , solution_name, folder_name)
-	    # Define the solution file path
-        solution_file_path = os.path.join(solution_output_folder, output_filename)
+        solution_output_folder = os.path.join(output_folder, period_enum_value, solution_name, folder_name)
+        output_csv_file = os.path.join(solution_output_folder, output_filename)
 
-	    # Check if the solution file exists, delete it if it does
-        if os.path.exists(solution_file_path):
-            os.remove(solution_file_path)  # Deletes the specific solution file
+        # Check if the solution file exists, delete it if it does
+        if os.path.exists(output_csv_file):
+            os.remove(output_csv_file)  # Deletes the specific solution file
 
         os.makedirs(solution_output_folder, exist_ok=True)
 
         sol.Connection(sol_file_path)
         print(f'Processing {collection} for {sol_file}...')
+
         try:
             if period_enum_value == "Interval" and collection == "Generators":
                 print('Interval query detected. Partitioning data...')
-
                 date_from, date_to = find_horizon(sol_file_path)
                 print(f"horizon dates: {date_from}, {date_to}")
 
@@ -205,97 +209,86 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
 
                 while current_date <= date_to:
                     end_of_year = (current_date + relativedelta(years=1)) - timedelta(hours=1)
-
                     if end_of_year > date_to:
                         end_of_year = date_to
 
                     TS0 = current_date.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
                     TS1 = end_of_year.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
 
-                    start = getattr(getattr(System, "DateTime"), "Parse")(TS0)  # Object DateFrom[ = None],
-                    end = getattr(getattr(System, "DateTime"), "Parse")(TS1) # Object DateTo[ = None],
+                    start = getattr(getattr(System, "DateTime"), "Parse")(TS0)
+                    end = getattr(getattr(System, "DateTime"), "Parse")(TS1)
                     print(f'Processing data from {TS0} to {TS1}...')
 
-                    # Dynamically generate output CSV file path based on partition time range
                     result = sol.QueryToList(
-                    simulation,       # SimulationPhaseEnum
-                    collectionEnum,   # Int32
-                    parentName,       # String
-                    childName,        # String
-                    periodEnum,       # PeriodEnum
-                    seriesEnum,       # SeriesTypeEnum
-                    property,     # String
-                    start,            # DateTime object for the start of the year
-                    end,              # DateTime object for the end of the year
-                    timeSliceList,    # String
-                    sampleList,       # String
-                    modelName,        # String
-                    aggregation,      # AggregationTypeEnum
-                    category,         # String
-                    seperator,        # String
-                    operation        # OperationTypeEnum    simulation,       # SimulationPhaseEnum
+                        simulation,
+                        collectionEnum,
+                        parentName,
+                        childName,
+                        periodEnum,
+                        seriesEnum,
+                        property,
+                        start,
+                        end,
+                        timeSliceList,
+                        sampleList,
+                        modelName,
+                        aggregation,
+                        category,
+                        seperator,
+                        operation
                     )
-                    output_csv_file = os.path.join(solution_output_folder, output_filename)
 
                     with open(output_csv_file, 'a', newline='') as csvfile:
                         csvwriter = csv.writer(csvfile)
-                        csvwriter.writerow(columns)
+
+                        # Write the header only if the file is being created for the first time
+                        if not os.path.exists(output_csv_file) or os.path.getsize(output_csv_file) == 0:
+                            csvwriter.writerow(columns)
 
                         for row in result:
                             try:
                                 row_data = [getattr(row, col, '') for col in ["category_name", "value"]]
                                 row_data.insert(1, "p1")  # Add "p1" in the second column
 
-                        # Split the _date and extract year, month, day, and hour
                                 date_str = str(row._date)
-
-                        # Corrected splitting of date
                                 date_parts = date_str.split(' ')
-                                date_component = date_parts[0].split('/')  # Assuming date format is MM/DD/YYYY
-                                time_component = date_parts[1].split(':') if len(date_parts) > 1 else [0]  # Time, if exists
+                                date_component = date_parts[0].split('/')
+                                time_component = date_parts[1].split(':') if len(date_parts) > 1 else [0]
 
-                                month = date_component[0]  # Month
-                                day = date_component[1]    # Day
-                                year = date_component[2]   # Year
+                                month = date_component[0]
+                                day = date_component[1]
+                                year = date_component[2]
+                                hour = int(time_component[0])
 
-                                hour = int(time_component[0])  # Hour part
-
-                        # Adjust hour based on AM/PM logic if needed
                                 if 'PM' in date_str and hour != 12:
                                     hour += 12
                                 elif 'AM' in date_str and hour == 12:
                                     hour = 0
 
-                        # Corrected row data
-                                row_data.insert(2, year)   # Insert year
-                                row_data.insert(3, month)  # Insert month
-                                row_data.insert(4, day)    # Insert day
-                                row_data.insert(5, hour)   # Insert hour
+                                row_data.insert(2, year)
+                                row_data.insert(3, month)
+                                row_data.insert(4, day)
+                                row_data.insert(5, hour)
 
-                        # The "value" is already in the last column (index 6 after p1 insert)
                                 csvwriter.writerow(row_data)
 
                             except Exception as e:
                                 print(f"Error processing row: {e}")
-            
+
                     print(f'Results saved to {output_csv_file}')
-
-
                     current_date += relativedelta(years=1)
-
 
         except Exception as e:
             error_message = f"Error processing {collection} for {sol_file_path}: {e}"
             print(error_message)
-            # Log the error message to a file
             error_file = "error_log.txt"
             with open(error_file, "a") as f:
                 f.write(f"Error processing {collection} for {sol_file_path}: {e}\n")
                 f.write(traceback.format_exc() + "\n")
             input('Press any key to continue...')
         finally:
-            # Important to Close() the Solution to clear working storage.
             sol.Close()
+
 
 # Get collections from the config file
 collections_str = "Generators"
@@ -327,7 +320,7 @@ else:
         for property in propertyList.split(','):
                 print(property)
                 process_collection_chunk(collection, input_folder, output_folder, sol_files, property)
-        print("Appending '_append' files to corresponding CSVs...")
-        append_files(output_folder)
+        #print("Appending '_append' files to corresponding CSVs...")
+        #append_files(output_folder)
     except Exception as e:
         print(f"Parallel execution failed with error: {e}")

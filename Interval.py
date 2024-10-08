@@ -272,7 +272,6 @@ else:
             
             for property in properties:
                 process_collection(collection, input_folder, output_folder, sol_files, property)
-        print("Appending '_append' files to corresponding CSVs...")
-        append_files(output_folder)
+    
     except Exception as e:
         print(f"Execution failed with error: {e}")
