@@ -117,12 +117,7 @@ def append_files(output_folder):
                 else:
                     print(f"Original file not found for {file}, skipping append.")
 
-import os
-import csv
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
-def process_collection_chunk(collection, input_folder, output_folder, sol_files, propertyList, date_from=None, date_to=None):
+def process_collection_chunk(collection, input_folder, output_folder, sol_files, property, period_enum_value):
     """
     Function to process a collection of data.
 
@@ -134,7 +129,6 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     """
     import System
 
-    period_enum_value = "Interval"
 
     # QueryToCSV Inputs
     append         = True
@@ -204,7 +198,7 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
                 date_from, date_to = find_horizon(sol_file_path)
                 print(f"horizon dates: {date_from}, {date_to}")
 
-                # Partition data by month
+                # Partition data by year
                 current_date = date_from
 
                 while current_date <= date_to:
@@ -277,6 +271,73 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
 
                     print(f'Results saved to {output_csv_file}')
                     current_date += relativedelta(years=1)
+            else:
+                # Non-interval case for Generators
+                print(f'Processing entire horizon for {collection} for {sol_file}...')
+                date_from, date_to = find_horizon(sol_file_path)
+                TS0 = date_from.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+                TS1 = date_to.strftime('%m/%d/%Y %I:%M:%S %p').replace('/0', '/').lstrip("0").replace(" 0", " ")
+
+                start = getattr(getattr(System, "DateTime"), "Parse")(TS0)
+                end = getattr(getattr(System, "DateTime"), "Parse")(TS1)
+                
+                result = sol.QueryToList(
+                    simulation,
+                    collectionEnum,
+                    parentName,
+                    childName,
+                    periodEnum,
+                    seriesEnum,
+                    property,
+                    start,
+                    end,
+                    timeSliceList,
+                    sampleList,
+                    modelName,
+                    aggregation,
+                    category,
+                    seperator,
+                    operation
+                )
+
+                with open(output_csv_file, 'a', newline='') as csvfile:
+                    csvwriter = csv.writer(csvfile)
+
+                    # Write the header only if the file is being created for the first time
+                    if not os.path.exists(output_csv_file) or os.path.getsize(output_csv_file) == 0:
+                        csvwriter.writerow(columns)
+
+                    for row in result:
+                        try:
+                            row_data = [getattr(row, col, '') for col in ["category_name", "value"]]
+                            row_data.insert(1, "p1")  # Add "p1" in the second column
+
+                            date_str = str(row._date)
+                            date_parts = date_str.split(' ')
+                            date_component = date_parts[0].split('/')
+                            time_component = date_parts[1].split(':') if len(date_parts) > 1 else [0]
+
+                            month = date_component[0]
+                            day = date_component[1]
+                            year = date_component[2]
+                            hour = int(time_component[0])
+
+                            if 'PM' in date_str and hour != 12:
+                                hour += 12
+                            elif 'AM' in date_str and hour == 12:
+                                hour = 0
+
+                            row_data.insert(2, year)
+                            row_data.insert(3, month)
+                            row_data.insert(4, day)
+                            row_data.insert(5, hour)
+
+                            csvwriter.writerow(row_data)
+
+                        except Exception as e:
+                            print(f"Error processing row: {e}")
+
+                print(f'Results saved to {output_csv_file}')
 
         except Exception as e:
             error_message = f"Error processing {collection} for {sol_file_path}: {e}"
@@ -289,9 +350,8 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
         finally:
             sol.Close()
 
-
 # Get collections from the config file
-collections_str = "Generators"
+collections_str = "Generators Emissions Batteries"
 collections = collections_str.split() if collections_str else []
 
 # Declare the collections to process
@@ -303,10 +363,7 @@ for collection in collections:
 input_folder = "PlexosSolutions"
 output_folder = "runs"
 
-
-
 sol_files = [f for f in os.listdir(input_folder) if f.endswith('.zip')]
-
 
 # Check if there are no solution files
 if not sol_files:
@@ -314,13 +371,23 @@ if not sol_files:
     input('Press any key to continue...')
 else:
     try:
-        # Run sequentially
-        print("Running sequentially...")
-        propertyList = "2,240"
-        for property in propertyList.split(','):
+        print("Please enter 'FiscalYear' or 'Interval' ")
+        period_enum_value = input()
+        for collection in collections:
+            match collection:
+                case "Generators":
+                    properties = ["2", "240"]
+                case "Batteries":
+                    properties = ["5", "6", "82"]
+                case "Emissions":
+                    properties = ["1"]
+                case _:
+                    properties = []
+                            
+            for property in properties:
                 print(property)
-                process_collection_chunk(collection, input_folder, output_folder, sol_files, property)
-        #print("Appending '_append' files to corresponding CSVs...")
-        #append_files(output_folder)
+                process_collection_chunk(collection, input_folder, output_folder, sol_files, property, period_enum_value)
+        print("Appending '_append' files to corresponding CSVs...")
+        append_files(output_folder)
     except Exception as e:
         print(f"Parallel execution failed with error: {e}")
