@@ -149,21 +149,27 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     if collection == "Batteries":
         if property == "5":
             output_filename = "gen_ann_append.csv"
+            units = ""
         elif property == "6":
             output_filename = "bat_load.csv"
+            units = ""
         elif property == "82":
             output_filename = "cap_append.csv"
+            units = ""
         else:
             return  # Skip unknown property
     elif collection == "Generators":
         if property == "2":
             output_filename = "gen_ann.csv"
+            units = ""
         elif property == "240":
             output_filename = "cap.csv"
+            units = ""
         else:
             return  # Skip unknown property
     elif collection == "Emissions" and property == "1":
         output_filename = "emit_r.csv"
+        units = ""
     else:
         return  # Skip unknown collection or property
 
