@@ -8,7 +8,7 @@ set INSTALL_PATH=%LOCALAPPDATA%\Miniforge3
 set ENV_NAME=xml2csv
 
 :: Set the paths to your Python scripts
-set PYTHON_SCRIPT=Interval.py
+set PYTHON_SCRIPT=Plexos2BokehPivot.py
 :: Activate Miniforge environment
 echo Activating Miniforge environment '%ENV_NAME%'...
 call "%INSTALL_PATH%\condabin\conda.bat" activate %ENV_NAME%

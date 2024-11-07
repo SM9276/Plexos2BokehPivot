@@ -183,7 +183,7 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     for sol_file in sol_files:
         sol_file_path = os.path.join(input_folder, sol_file)
         print(sol_file_path)
-        folder_name = "Outputs"
+        folder_name = "outputs"
         
         solution_name = os.path.splitext(sol_file)[0]
         solution_output_folder = os.path.join(output_folder, period_enum_value, solution_name, folder_name)
