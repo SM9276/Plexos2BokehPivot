@@ -175,7 +175,17 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
 
     # Common columns for all files
     columns = ["category_name", "p1", "year", "month", "day", "hour", "value"]
-    print(f"Processing collection '{collection}' with PeriodEnum {period_enum_value} and sol files: {sol_files}")
+    
+    # Set the number of files per line
+    files_per_row = 3
+
+    # Display the collection and period information
+    print(f"Processing collection '{collection}' with PeriodEnum {period_enum_value} and sol files:")
+
+    # Format the solution files output
+    for i in range(0, len(sol_files), files_per_row):
+        # Join up to files_per_row elements for each line
+        print("    " + ", ".join(sol_files[i:i + files_per_row]))
 
     sol = Solution()
 
