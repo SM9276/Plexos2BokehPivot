@@ -1,5 +1,5 @@
-Property
-Units
+Property, Collection
+Units, Generator
 Generation
 Dispatchable Capacity
 Undispatched Capacity
@@ -22,7 +22,7 @@ Units Retired
 Capacity Built
 Capacity Retired
 Build Cost
-Units
+Units, Battery
 Energy
 SoC
 Available SoC
@@ -44,9 +44,9 @@ Generation Capacity Built
 Build Cost
 Units Retired
 Pump Load
-Production
-Production
-Load
+Production, Emission
+Production, Emission.Generators
+Load, Region
 Native Load
 Imports
 Exports
@@ -77,7 +77,7 @@ Capacity Price
 Generator Build Cost
 Total Cost
 Levelized Cost
-Peak Load
+Peak Load, Zone
 Min Capacity Reserves
 Capacity Reserves
 Min Capacity Reserve Margin
