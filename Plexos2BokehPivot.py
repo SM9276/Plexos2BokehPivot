@@ -27,6 +27,47 @@ from PLEXOSCommon.Enums import *
 from System import DateTime
 from System import *
 
+def get_property_enum_map(collection_name, solution_file_path):
+    """
+    Get a dictionary of property names and their enums for a specific collection.
+
+    Args:
+    - collection_name: Name of the collection to retrieve properties for (e.g., "Generators").
+    - solution_file_path: Path to the solution file to connect to.
+
+    Returns:
+    - property_enum_map: Dictionary of properties with successful enum retrievals.
+    """
+    sol = Solution()
+    property_enum_map = {}
+    
+    # Derive classid based on the collection name
+    if collection_name == "EmissionGenerators":
+        classid = "Emission"
+    else:
+        classid = collection_name[:-1] if collection_name.endswith('s') else collection_name
+
+    try:
+        # Connect to the specified solution file
+        sol.Connection(solution_file_path)
+        
+        # Retrieve available properties and their enums
+        properties = sol.GetReportedProperties()
+        for prop in properties:
+            try:
+                # Obtain the enum ID
+                enum_id = sol.PropertyName2EnumId("System", classid, collection_name, prop)
+                enum_id = str(enum_id) # P10 API takes the string of the integer of the enum as input for queryToList()
+                property_enum_map[prop] = enum_id
+            except Exception as e:
+                print(f"Could not retrieve enum for property '{prop}': {e}")
+    except Exception as e:
+        print(f"Error retrieving properties for collection {collection_name}: {e}")
+    finally:
+        sol.Close()
+    
+    return property_enum_map
+
 def find_horizon(sol_file, print_enabled=False):
     """
     Function to find a model's horizon of dates in the XML file within a specified zip file.
@@ -117,7 +158,9 @@ def append_files(output_folder):
                 else:
                     print(f"Original file not found for {file}, skipping append.")
 
-def process_collection_chunk(collection, input_folder, output_folder, sol_files, property, period_enum_value):
+# def process_collection_chunk(collection, input_folder, output_folder, sol_files, property, period_name):
+def process_collection_chunk(collection, input_folder, output_folder, sol_files, property_enum, period_name, property_name):
+
     """
     Function to process a collection of data.
 
@@ -133,11 +176,12 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     # QueryToCSV Inputs
     append         = True
     simulation     = SimulationPhaseEnum.LTPlan
-    periodEnum     = getattr(PeriodEnum, f'{period_enum_value}')  
+    periodEnum     = getattr(PeriodEnum, f'{period_name}')  
     collectionEnum = int(getattr(CollectionEnum, f'System{collection}') if collection != 'EmissionGenerators' else CollectionEnum.EmissionGenerators)
     parentName     = "" 
     childName      = ""
     seriesEnum     = SeriesTypeEnum.Properties
+    property       = property_enum
     timeSliceList  = ""
     sampleList     = ""
     modelName      = ""
@@ -146,32 +190,25 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     seperator      = ","
     operation      = OperationTypeEnum.SUM
 
-    if collection == "Batteries":
-        if property == "5":
-            output_filename = "gen_ann_append.csv"
-            units = ""
-        elif property == "6":
-            output_filename = "bat_load.csv"
-            units = ""
-        elif property == "82":
-            output_filename = "cap_append.csv"
-            units = ""
-        else:
-            return  # Skip unknown property
-    elif collection == "Generators":
-        if property == "2":
-            output_filename = "gen_ann.csv"
-            units = ""
-        elif property == "240":
-            output_filename = "cap.csv"
-            units = ""
-        else:
-            return  # Skip unknown property
-    elif collection == "Emissions" and property == "1":
-        output_filename = "emit_r.csv"
-        units = ""
-    else:
-        return  # Skip unknown collection or property
+    # Define heuristic for output filenames based on collection and property names
+    def get_output_filename(collection, property_name):
+        if collection == "Batteries":
+            if property_name == "Generation":
+                return "gen_ann_append.csv"
+            elif property_name == "Load":
+                return "bat_load.csv"
+            elif property_name == "Capacity Built":
+                return "cap_append.csv"
+        elif collection == "Generators":
+            if property_name == "Generation":
+                return "gen_ann.csv"
+            elif property_name == "Capacity Built":
+                return "cap.csv"
+        elif collection == "Emissions" and property_name == "Emission Rate":
+            return "emit_r.csv"
+        return f"{property_name.lower().replace(' ', '_')}.csv"  # Default naming convention
+    
+    output_filename = get_output_filename(collection, property_name)
 
     # Common columns for all files
     columns = ["category_name", "p1", "year", "month", "day", "hour", "value"]
@@ -180,7 +217,7 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
     files_per_row = 3
 
     # Display the collection and period information
-    print(f"Processing collection '{collection}' with PeriodEnum {period_enum_value} and sol files:")
+    print(f"Processing collection '{collection}' with PeriodEnum {period_name} and sol files:")
 
     # Format the solution files output
     for i in range(0, len(sol_files), files_per_row):
@@ -196,20 +233,19 @@ def process_collection_chunk(collection, input_folder, output_folder, sol_files,
         folder_name = "outputs"
         
         solution_name = os.path.splitext(sol_file)[0]
-        solution_output_folder = os.path.join(output_folder, period_enum_value, solution_name, folder_name)
+        solution_output_folder = os.path.join(output_folder, period_name, solution_name, folder_name)
         output_csv_file = os.path.join(solution_output_folder, output_filename)
 
         # Check if the solution file exists, delete it if it does
         if os.path.exists(output_csv_file):
             os.remove(output_csv_file)  # Deletes the specific solution file
-
         os.makedirs(solution_output_folder, exist_ok=True)
 
         sol.Connection(sol_file_path)
         print(f'Processing {collection} for {sol_file}...')
 
         try:
-            if period_enum_value == "Interval" and collection == "Generators":
+            if period_name == "Interval" and collection == "Generators":
                 print('Interval query detected. Partitioning data...')
                 date_from, date_to = find_horizon(sol_file_path)
                 print(f"horizon dates: {date_from}, {date_to}")
@@ -375,35 +411,47 @@ print('Collections to process: ')
 for collection in collections:
     print(collection)
 
+properties_to_query = {
+    # "Generators": ["Generation", "Installed Capacity"],
+    "EmissionGenerators": ["Production"],
+    # "Batteries": ["Generation", "Load", "InStalled Capacity"]
+}
+
 # Get input and output folder paths
 input_folder = "PlexosSolutions"
 output_folder = "runs"
 
 sol_files = [f for f in os.listdir(input_folder) if f.endswith('.zip')]
 
+for sol_file in sol_files:
+    solution_file_path = os.path.join(input_folder, sol_file)
+
 # Check if there are no solution files
 if not sol_files:
     print(f'No solution files found in {input_folder}. Exiting...')
     input('Press any key to continue...')
 else:
-    try:
-        print("Please enter 'FiscalYear' or 'Interval' ")
-        period_enum_value = input()
-        for collection in collections:
-            match collection:
-                case "Generators":
-                    properties = ["2", "240"]
-                case "Batteries":
-                    properties = ["5", "6", "82"]
-                case "Emissions":
-                    properties = ["1"]
-                case _:
-                    properties = []
-                            
-            for property in properties:
-                print(property)
-                process_collection_chunk(collection, input_folder, output_folder, sol_files, property, period_enum_value)
-        print("Appending '_append' files to corresponding CSVs...")
-        append_files(output_folder)
-    except Exception as e:
-        print(f"Parallel execution failed with error: {e}")
+    period_name = input("Please enter 'FiscalYear' or 'Interval': ")
+    
+    for collection in collections:
+
+        property_enum_map = get_property_enum_map(collection, solution_file_path)
+
+        # Process only the specified properties for this collection
+        if collection in properties_to_query:
+            for prop_name in properties_to_query[collection]:
+                if prop_name in property_enum_map:
+                    property_enum = property_enum_map[prop_name]
+                    process_collection_chunk(collection, input_folder, output_folder, sol_files, property_enum, period_name, prop_name)
+                else:
+                    print(f"Property '{prop_name}' not found in the {collection} collection.")
+    
+        # for prop_name in properties_to_query:
+        #     if prop_name in property_enum_map[collection]:
+        #         property_enum = property_enum_map[collection][prop_name]
+        #         process_collection_chunk(collection, input_folder, output_folder, sol_files, property_enum, period_name, prop_name)
+        #     else:
+        #         print(f"Property '{prop_name}' not found in the {collection} collection.")        # Retrieve property-enum mapping for the current solution file and collection
+
+    print("Appending '_append' files to corresponding CSVs...")
+    append_files(output_folder)
