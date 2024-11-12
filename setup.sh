@@ -13,20 +13,17 @@ INSTALL_PATH="$HOME/Miniforge3"
 # Download the Miniforge installer if not present
 if [ ! -f "$INSTALL_PATH/bin/conda" ]; then
     echo "Miniforge not found. Downloading Miniforge installer..."
-
+    
     # Determine the URL for the Miniforge installer
     MINIFORGE_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
-
+    
     # Download the installer
     curl -L -O "$MINIFORGE_URL"
-
-    # Make the installer executable
+    
+    # Run the installer
     chmod +x Miniforge3-Linux-x86_64.sh
-
-    # Install Miniforge
-    echo "Installing Miniforge..."
     ./Miniforge3-Linux-x86_64.sh -b -p "$INSTALL_PATH"
-
+    
     # Clean up the installer
     rm Miniforge3-Linux-x86_64.sh
 fi
@@ -36,7 +33,7 @@ echo "Activating Miniforge..."
 source "$INSTALL_PATH/bin/activate"
 
 # Specify the environment name and the YAML file name
-ENV_NAME="xml2csv"
+ENV_NAME="xml_linux"
 YAML_FILE="environment.yaml"
 
 # Create conda environment from YAML file
@@ -57,3 +54,4 @@ echo -n "$PYTHON_EXECUTABLE" > python_executable_path.txt
 
 # Display success message
 echo "Python executable path for $ENV_NAME environment written to python_executable_path.txt"
+
