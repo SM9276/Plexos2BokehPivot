@@ -146,7 +146,7 @@ def create_mapping(df, collection_mapping):
         mapping[str(cid)] = selected_property_ids  # Use str(cid) to make JSON keys strings
     
     # Save the mapping to mapping.json
-    mapping_path = os.path.join(os.path.dirname(__file__), 'mapping.json')
+    mapping_path = os.path.join(os.path.dirname(__file__), 'mappings.json')
     with open(mapping_path, 'w') as f:
         json.dump(mapping, f, indent=4)
     
