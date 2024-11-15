@@ -2128,7 +2128,7 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
-
+    
     ('CO2 Emissions BA (tonne)',
         {'file':'emit_r.csv',
         'columns': ['e', 'rb', 'year', 'Emissions (tonne)'],
@@ -2142,7 +2142,118 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
+('CO2 Emissions National (Yearly)',
+    {
+        'file': 'emit_r.csv',
+        'columns': ['e', 'rb', 'year', 'month', 'day', 'hour', 'Emissions (tonne)'],
+        'preprocess': [
+            {'func': sum_over_cols, 'args': {'drop_cols': ['rb', 'month', 'day', 'hour'], 'group_cols': ['e', 'year']}},
+        ],
+        'index': ['e', 'year'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars', {
+                'x': 'year',
+                'y': 'Emissions (tonne)',
+                'series': 'e',
+                'explode': 'scenario',
+                'chart_type': 'Bar',
+                'bar_width': '1',
+                'filter': {'e': ['co2']}
+            }),
+        )),
+    }
+),
 
+('CO2 Emissions National (Monthly)',
+    {
+        'file': 'emit_r.csv',
+        'columns': ['e', 'rb', 'year', 'month', 'day', 'hour', 'Emissions (tonne)'],
+        'preprocess': [
+            {
+                'func': sum_over_months,
+                'args': {
+                    'drop_cols': ['rb', 'day', 'hour'],
+                    'group_cols': ['e', 'year'],
+                    'month_col': 'month'
+                }
+            },
+        ],
+        'index': ['e', 'year', 'month'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars', {
+                'x': 'month',
+                'y': 'Emissions (tonne)',
+                'series': 'e',
+                'explode': 'scenario',
+                'chart_type': 'Bar',
+                'bar_width': '1',
+                'filter': {'year': 'last', 'e': ['co2']}
+            }),
+        )),
+    }
+),
+
+('CO2 Emissions National (Daily)',
+    {
+        'file': 'emit_r.csv',
+        'columns': ['e', 'rb', 'year', 'month', 'day', 'hour', 'Emissions (tonne)'],
+        'preprocess': [
+            {
+                'func': sum_over_days,
+                'args': {
+                    'drop_cols': ['rb', 'hour'],
+                    'group_cols': ['e', 'year'],
+                    'month_col': 'month',
+                    'day_col': 'day'
+                }
+            },
+        ],
+        'index': ['e', 'year', 'month', 'day'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars', {
+                'x': 'day',
+                'y': 'Emissions (tonne)',
+                'series': 'e',
+                'explode': 'scenario',
+                'chart_type': 'Bar',
+                'bar_width': '1',
+                'filter': {'year': 'last', 'month': 'last', 'e': ['co2']}
+            }),
+        )),
+    }
+),
+
+('CO2 Emissions National (Hourly)',
+    {
+        'file': 'emit_r.csv',
+        'columns': ['e', 'rb', 'year', 'month', 'day', 'hour', 'Emissions (tonne)'],
+        'preprocess': [
+            {
+                'func': sum_over_hours,
+                'args': {
+                    'drop_cols': ['rb'],
+                    'group_cols': ['e', 'year'],
+                    'month_col': 'month',
+                    'day_col': 'day',
+                    'hour_col': 'hour'
+                }
+            },
+        ],
+        'index': ['e', 'year', 'month', 'day', 'hour'],
+        'presets': collections.OrderedDict((
+            ('Stacked Bars', {
+                'x': 'hour',
+                'y': 'Emissions (tonne)',
+                'series': 'e',
+                'explode': 'scenario',
+                'chart_type': 'Bar',
+                'bar_width': '1',
+                'filter': {'year': 'last', 'month': 'last', 'day': 'last', 'e': ['co2']}
+            }),
+        )),
+    }
+),
+    
     ('Net CO2e Emissions National (MMton)',
         {'sources': [
             {'name': 'emit', 'file': 'emit_nat_tech.csv', 'columns': ['e', 'tech', 'year', 'CO2e (MMton)']},
