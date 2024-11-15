@@ -25,12 +25,6 @@ def recordset_to_list(rs):
 def parse_collection_enum(collection_enum_str):
     """
     Parse the CollectionEnum string into a dictionary mapping collection_id to collection_name.
-    
-    Args:
-    - collection_enum_str: The string containing the CollectionEnum definitions.
-    
-    Returns:
-    - dict: A dictionary where keys are collection_ids and values are collection_names.
     """
     collection_mapping = {}
     lines = collection_enum_str.strip().split('\n')
@@ -47,12 +41,6 @@ def parse_collection_enum(collection_enum_str):
 def get_report_properties(model_name):
     """
     Get a DataFrame containing combined report and property information based on the specified model's reports.
-    
-    Args:
-    - model_name: The name of the model to retrieve report properties for.
-    
-    Returns:
-    - DataFrame: Combined DataFrame of report and property information.
     """
     # Load the XML model file
     model = DatabaseCore()
@@ -73,7 +61,6 @@ def get_report_properties(model_name):
     recordset.Close()
     
     # Filter to include only reports matching the model
-    report_df['filtered_report'] = report_df['object_id'].apply(lambda x: x in report_ids)
     report_df = report_df[report_df['object_id'].isin(report_ids)]
     
     # Use the GetData function to get a record set with t_property_report into a pd data frame
@@ -82,10 +69,21 @@ def get_report_properties(model_name):
     report_prop_df = pd.DataFrame(report_prop_data, columns=[f.Name for f in recordset.Fields])
     recordset.Close()
 
-    # Set index and join the DataFrames
-    report_prop_df = report_prop_df.set_index('property_id')
-    combined_df = report_df.join(report_prop_df, on='property_id', rsuffix='_prop')
+    # Use the GetData function to get a record set with t_property to get enum_id
+    recordset, _ = model.GetData('t_property', [])
+    property_data = recordset_to_list(recordset)
+    property_df = pd.DataFrame(property_data, columns=[f.Name for f in recordset.Fields])
+    recordset.Close()
 
+    # Merge property_df with report_prop_df to get enum_id
+    property_df = property_df.set_index('property_id')
+    report_prop_df = report_prop_df.set_index('property_id')
+    report_prop_df = report_prop_df.join(property_df[['enum_id', 'collection_id']], on='property_id', rsuffix='_prop')
+
+    # Join the report df and the property df to associate reports with properties
+    combined_df = report_df.join(report_prop_df, on='property_id', rsuffix='_prop')
+    combined_df.reset_index(inplace=True)
+    
     # Close the model file
     model.Close()
     return combined_df
@@ -93,13 +91,6 @@ def get_report_properties(model_name):
 def create_mapping(df, collection_mapping):
     """
     Create a mapping of collection_ids to selected properties based on user input.
-    
-    Args:
-    - df: DataFrame containing the combined report and property information.
-    - collection_mapping: Dictionary mapping collection_id to collection_name.
-    
-    Returns:
-    - None. The mapping is saved to 'mapping.json'.
     """
     # Get unique collection_ids
     collection_ids = df['collection_id'].unique()
@@ -126,26 +117,25 @@ def create_mapping(df, collection_mapping):
         cname = collection_map[cid]
         # Get properties associated with this collection_id
         prop_df = df[df['collection_id'] == cid]
-        properties = prop_df[['property_id', 'name']].drop_duplicates()
-        property_ids = properties['property_id'].unique()
-        # Map property_ids to property names for display
+        properties = prop_df[['enum_id', 'name']].drop_duplicates()
+        # Map enum_ids to property names for display
         property_map = {}
         for idx, row in properties.iterrows():
-            pid = row['property_id']
+            eid = int(row['enum_id'])
             pname = row['name']
-            property_map[pid] = pname
+            property_map[eid] = pname
         # Display properties to the user
         print(f"\nProperties for {cname} (Collection ID: {cid}):")
-        for idx, (pid, pname) in enumerate(property_map.items()):
-            print(f"{idx + 1}. {pname} (Property ID: {pid})")
+        for idx, (eid, pname) in enumerate(property_map.items()):
+            print(f"{idx + 1}. {pname} (Enum ID: {eid})")
         # Ask the user to select properties
         selected_props = input(f"Enter the numbers of the properties you want to select for '{cname}' (e.g., 1,3,5): ")
         selected_prop_indices = [int(x.strip()) - 1 for x in selected_props.split(',')]
-        selected_property_ids = [list(property_map.keys())[i] for i in selected_prop_indices]
+        selected_enum_ids = [list(property_map.keys())[i] for i in selected_prop_indices]
         # Save to mapping
-        mapping[str(cid)] = selected_property_ids  # Use str(cid) to make JSON keys strings
+        mapping[str(cid)] = selected_enum_ids  # Use str(cid) to make JSON keys strings
     
-    # Save the mapping to mapping.json
+    # Save the mapping to mappings.json
     mapping_path = os.path.join(os.path.dirname(__file__), 'mappings.json')
     with open(mapping_path, 'w') as f:
         json.dump(mapping, f, indent=4)
@@ -155,8 +145,8 @@ def create_mapping(df, collection_mapping):
 def main():
     model_name = 'RPS_000_SPS_000'
     df = get_report_properties(model_name)
-    
-    # The CollectionEnum string provided
+
+    # The CollectionEnum string provided (add your CollectionEnum string here)
     collection_enum_str = '''
     CollectionEnum
         SystemGenerators = 1
@@ -966,7 +956,6 @@ def main():
         LayoutWaterNodes = 805
         LayoutFlowNodes = 806
     '''
-
     # Parse the CollectionEnum string
     collection_mapping = parse_collection_enum(collection_enum_str)
 
